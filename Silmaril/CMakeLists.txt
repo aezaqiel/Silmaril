@@ -2,10 +2,35 @@ add_subdirectory(thirdparty/glm)
 
 add_executable(Silmaril
     src/Silmaril/Main.cpp
+    src/Silmaril/Types.hpp
 
-    src/Silmaril/Core/Types.hpp
+    src/Silmaril/Cameras/Camera.hpp
+    src/Silmaril/Cameras/PerspectiveCamera.hpp
+
+    src/Silmaril/Containers/Ray.hpp
+    src/Silmaril/Containers/Bounds.hpp
+    src/Silmaril/Containers/AABB.hpp
+    src/Silmaril/Containers/AABB.cpp
+    src/Silmaril/Containers/Interaction.hpp
+
     src/Silmaril/Core/Application.hpp
     src/Silmaril/Core/Application.cpp
+
+    src/Silmaril/Geometry/Shape.hpp
+    src/Silmaril/Geometry/Primitive.hpp
+
+    src/Silmaril/Integrators/Integrator.hpp
+    src/Silmaril/Integrators/RandomWalkIntegrator.hpp
+    src/Silmaril/Integrators/RandomWalkIntegrator.cpp
+
+    src/Silmaril/Lights/Light.hpp
+
+    src/Silmaril/Materials/BSDF.hpp
+    src/Silmaril/Materials/Material.hpp
+
+    src/Silmaril/Samplers/Sampler.hpp
+
+    src/Silmaril/Scene/Scene.hpp
 )
 
 target_include_directories(Silmaril
