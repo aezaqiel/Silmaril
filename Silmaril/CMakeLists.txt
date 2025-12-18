@@ -1,3 +1,4 @@
+add_subdirectory(thirdparty/glm)
 
 add_executable(Silmaril
     src/Silmaril/Main.cpp
@@ -14,11 +15,13 @@ PRIVATE
 
 target_link_libraries(Silmaril
 PRIVATE
+    glm
 )
 
 target_compile_definitions(Silmaril
 PRIVATE
     NOMINMAX
+    GLM_ENABLE_EXPERIMENTAL
 )
 
 target_precompile_headers(Silmaril

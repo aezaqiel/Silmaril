@@ -1,0 +1,3 @@
+[submodule "Silmaril/thirdparty/glm"]
+	path = Silmaril/thirdparty/glm
+	url = https://github.com/aezaqiel/glm
