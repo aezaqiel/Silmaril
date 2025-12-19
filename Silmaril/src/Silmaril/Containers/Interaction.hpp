@@ -3,12 +3,12 @@
 #include <glm/glm.hpp>
 
 #include "Ray.hpp"
+#include "Silmaril/Materials/BSDF.hpp"
 
 namespace Silmaril {
 
     class Shape;
     class Primitive;
-    class BSDF;
 
     struct Interaction
     {

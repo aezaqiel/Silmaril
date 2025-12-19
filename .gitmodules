@@ -1,3 +1,6 @@
 [submodule "Silmaril/thirdparty/glm"]
 	path = Silmaril/thirdparty/glm
 	url = https://github.com/aezaqiel/glm
+[submodule "Silmaril/thirdparty/stb"]
+	path = Silmaril/thirdparty/stb
+	url = https://github.com/nothings/stb

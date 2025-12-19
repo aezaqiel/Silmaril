@@ -2,9 +2,10 @@
 
 #include <glm/glm.hpp>
 
-namespace Silmaril {
+#include "Film.hpp"
+#include "Silmaril/Containers/Ray.hpp"
 
-    struct Ray;
+namespace Silmaril {
 
     struct CameraSample
     {
@@ -14,9 +15,15 @@ namespace Silmaril {
     class Camera
     {
     public:
+        Camera(const std::shared_ptr<Film>& film);
         virtual ~Camera() = default;
 
+        inline Film& GetFilm() const { return *m_Film; }
+
         virtual Ray GenerateRay(const CameraSample& s) const = 0;
+
+    private:
+        std::shared_ptr<Film> m_Film;
     };
 
 }

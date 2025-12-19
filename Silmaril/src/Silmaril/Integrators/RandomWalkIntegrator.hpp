@@ -1,11 +1,14 @@
 #pragma once
 
+#include <glm/glm.hpp>
+
 #include "Integrator.hpp"
 
 namespace Silmaril {
 
     class Camera;
     class Sampler;
+    struct Ray;
 
     class RandomWalkIntegrator final : public Integrator
     {
@@ -14,6 +17,9 @@ namespace Silmaril {
         ~RandomWalkIntegrator() = default;
 
         virtual void Render(const Scene& scene) override;
+
+    private:
+        glm::vec3 Li(const Ray& ray, const Scene& scene, Sampler& sampler, usize depth);
 
     private:
         std::shared_ptr<Camera> m_Camera;

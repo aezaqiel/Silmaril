@@ -2,9 +2,9 @@
 
 #include <glm/glm.hpp>
 
-namespace Silmaril {
+#include "Silmaril/Containers/Interaction.hpp"
 
-    struct Interaction;
+namespace Silmaril {
 
     struct LightSample
     {
