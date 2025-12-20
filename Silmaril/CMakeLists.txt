@@ -38,6 +38,9 @@ add_executable(Silmaril
     src/Silmaril/Lights/PointLight.hpp
     src/Silmaril/Lights/PointLight.cpp
 
+    src/Silmaril/Loaders/MeshLoader.hpp
+    src/Silmaril/Loaders/MeshLoader.cpp
+
     src/Silmaril/Materials/BSDF.hpp
     src/Silmaril/Materials/Material.hpp
     src/Silmaril/Materials/MatteMaterial.hpp
@@ -78,6 +81,7 @@ PRIVATE
 )
 
 file(TO_CMAKE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/render OUTPUT_FOLDER)
+file(TO_CMAKE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/res RES_FOLDER)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/PathConfig.inl
