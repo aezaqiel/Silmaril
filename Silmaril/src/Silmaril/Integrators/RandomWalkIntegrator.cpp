@@ -22,6 +22,9 @@ namespace Silmaril {
         std::vector<u32> yCoords(height);
         std::iota(yCoords.begin(), yCoords.end(), 0);
 
+        std::atomic<u32> completedRows = 0;
+        std::mutex printMutex;
+
         std::for_each(std::execution::par, yCoords.begin(), yCoords.end(),
             [&](u32 y) {
                 auto sampler = m_Sampler->Clone();
@@ -43,8 +46,22 @@ namespace Silmaril {
                     accumulator /= static_cast<f32>(sampler->GetSPP());
                     m_Camera->GetFilm().SetPixel(x, y, accumulator);
                 }
+
+                u32 finished = ++completedRows;
+
+                if (finished % std::max(1u, height / 100) == 0 || finished == height) {
+                    std::scoped_lock lock(printMutex);
+                    
+                    f32 percentage = 100.0f * static_cast<f32>(finished) / static_cast<f32>(height);
+                    u32 barWidth = 50;
+                    u32 pos = static_cast<u32>(percentage / 100.0f * barWidth);
+
+                    std::print(std::cout, "\rProgress: [{:<{}}] {:>5.1f}%", std::string(pos, '=') + (pos < barWidth ? ">" : ""), barWidth, percentage);
+                    std::cout.flush();
+                }
             }
         );
+        std::println(std::cout, "");
 
         m_Camera->GetFilm().Write("Output.png");
     }
