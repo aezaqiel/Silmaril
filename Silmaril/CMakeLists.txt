@@ -23,6 +23,11 @@ add_executable(Silmaril
     src/Silmaril/Geometry/GeometricPrimitive.cpp
     src/Silmaril/Geometry/Sphere.hpp
     src/Silmaril/Geometry/Sphere.cpp
+    src/Silmaril/Geometry/Mesh.hpp
+    src/Silmaril/Geometry/Triangle.hpp
+    src/Silmaril/Geometry/Triangle.cpp
+    src/Silmaril/Geometry/BVH.hpp
+    src/Silmaril/Geometry/BVH.cpp
 
     src/Silmaril/Integrators/Integrator.hpp
     src/Silmaril/Integrators/RandomWalkIntegrator.hpp
