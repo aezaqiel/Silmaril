@@ -1,4 +1,5 @@
 build/
+Silmaril/res/Assets/Bistro/
 
 CMakeLists.txt.user
 CMakeCache.txt

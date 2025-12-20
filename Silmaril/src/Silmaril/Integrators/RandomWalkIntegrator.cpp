@@ -25,6 +25,9 @@ namespace Silmaril {
         std::atomic<u32> completedRows = 0;
         std::mutex printMutex;
 
+        std::println("Integrator: Starting parallel render loop...");
+        auto loopStart = std::chrono::high_resolution_clock::now();
+
         std::for_each(std::execution::par, yCoords.begin(), yCoords.end(),
             [&](u32 y) {
                 auto sampler = m_Sampler->Clone();
@@ -63,6 +66,11 @@ namespace Silmaril {
         );
         std::println(std::cout, "");
 
+        auto loopEnd = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> loopTime = loopEnd - loopStart;
+        std::println("Integrator: Compute finished in {:.4f} seconds", loopTime.count());
+
+        std::println("Integrator: Saving image...");
         m_Camera->GetFilm().Write("Output.png");
     }
 

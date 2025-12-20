@@ -25,6 +25,8 @@ int main()
     u32 samples = 32;
     u32 depth = 8;
 
+    std::println("Initializing Scene...");
+
     std::vector<std::shared_ptr<Primitive>> primitives;
     std::vector<std::shared_ptr<Light>> lights;
 
@@ -44,14 +46,24 @@ int main()
         primitives.push_back(std::make_shared<GeometricPrimitive>(sphere, redMat));
     }
 
+    std::println("Total Primitives: {}", primitives.size());
+
     auto floorSphere = std::make_shared<Sphere>(glm::vec3(0.0f, -1010.0f, 0.0f), 1000.0f);
     primitives.push_back(std::make_shared<GeometricPrimitive>(floorSphere, floorMat));
 
-    std::println("Building BVH");
+    std::println("Building BVH...");
+    auto startBVH = std::chrono::steady_clock::now();
+
     auto bvh = BVH::Create(primitives);
+
+    auto endBVH = std::chrono::steady_clock::now();
+    std::chrono::duration<double> timeBVH = endBVH - startBVH;
+    std::println("BVH built in {:.4f} seconds", timeBVH.count());
 
     lights.push_back(std::make_shared<PointLight>(glm::vec3(5.0f, 10.0f, 5.0f), glm::vec3(800.0f)));
     lights.push_back(std::make_shared<PointLight>(glm::vec3(-5.0f, 5.0f, -5.0f), glm::vec3(200.0f)));
+
+    std::println("Total Lights: {}", lights.size());
 
     Scene scene(bvh, lights);
 
@@ -60,11 +72,28 @@ int main()
     glm::vec3 lookfrom(0.0f, 1.0f, 5.0f);
     glm::vec3 lookat(0.0f, 0.0f, 0.0f);
     glm::vec3 up(0.0f, 1.0f, 0.0f);
-    auto camera = std::make_shared<PerspectiveCamera>(film, lookfrom, lookat, up, 60.0f);
+    f32 fov = 60.0f;
+
+    auto camera = std::make_shared<PerspectiveCamera>(film, lookfrom, lookat, up, fov);
+
+    std::println("Camera Settings:");
+    std::println(" - Position: ({}, {}, {})", lookfrom.x, lookfrom.y, lookfrom.z);
+    std::println(" - LookAt:   ({}, {}, {})", lookat.x, lookat.y, lookat.z);
+    std::println(" - FOV:      {}", fov);
 
     auto sampler = std::make_shared<RandomSampler>(samples);
 
     std::println("Starting render");
+    std::println(" - Resolution: {}x{}", width, height);
+    std::println(" - samples:    {}", samples);
+    std::println(" - depth:      {}", depth);
+
     RandomWalkIntegrator integrator(camera, sampler, depth);
+
+    auto startRender = std::chrono::high_resolution_clock::now();
     integrator.Render(scene);
+    auto endRender = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> timeRender = endRender - startRender;
+
+    std::println("Total Execution Time (Render + Save): {:.4f} seconds", timeRender.count());
 }

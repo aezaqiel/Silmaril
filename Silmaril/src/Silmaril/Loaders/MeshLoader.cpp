@@ -28,7 +28,7 @@ namespace Silmaril {
         }
 
         if (!reader.Warning().empty()) {
-            std::println(std::clog, "TinyObjReader: ", reader.Warning());
+            std::println(std::clog, "TinyObjReader: {}", reader.Warning());
         }
 
         const auto& attrib = reader.GetAttrib();
