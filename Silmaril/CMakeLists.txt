@@ -1,4 +1,5 @@
 add_subdirectory(thirdparty/glm)
+add_subdirectory(thirdparty/tinyobjloader)
 
 add_executable(Silmaril
     src/Silmaril/Main.cpp
@@ -62,6 +63,7 @@ PRIVATE
 target_link_libraries(Silmaril
 PRIVATE
     glm
+    tinyobjloader
 )
 
 target_compile_definitions(Silmaril
