@@ -37,14 +37,40 @@ namespace Silmaril {
         }
 
         distance = root;
-        intersect.t = root;
-        intersect.p = ray.At(root);
-        intersect.n = (intersect.p - m_Center) / m_Radius;
-        intersect.wo = -ray.direction;
 
-        f32 theta = glm::acos(-intersect.n.y);
-        f32 phi = glm::atan(intersect.n.z, intersect.n.x) + glm::pi<f32>();
-        intersect.uv = glm::vec2(phi / (2.0f * glm::pi<f32>()), theta / glm::pi<f32>());
+        glm::vec3 p = ray.At(root);
+        glm::vec3 n = (p - m_Center) / m_Radius;
+
+        f32 theta = glm::acos(std::clamp(-n.y, -1.0f, 1.0f));
+        f32 phi = std::atan2(n.z, n.x) + glm::pi<f32>();
+
+        glm::vec2 uv(phi / (2.0f * glm::pi<f32>()), theta / glm::pi<f32>());
+
+        f32 zRadius = glm::sqrt(n.x * n.x + n.z * n.z);
+        f32 invZRadius = (zRadius == 0.0f) ? 0.0f : 1.0f / zRadius;
+        f32 cosPhi = n.x * invZRadius;
+        f32 sinPhi = n.z * invZRadius;
+
+        glm::vec3 dpdu = glm::vec3(-m_Radius * n.z, 0.0f, m_Radius * n.x) * 2.0f * glm::pi<f32>();
+        glm::vec3 dpdv = glm::vec3(-n.y * cosPhi, zRadius, -n.y * sinPhi) * m_Radius * glm::pi<f32>();
+
+        if (zRadius == 0.0f) {
+            if (n.y > 0.0f) {
+                dpdu = glm::vec3(m_Radius * 2.0f * glm::pi<f32>(), 0.0f, 0.0f);
+                dpdv = glm::vec3(0.0f, 0.0f, m_Radius * glm::pi<f32>());
+            } else {
+                dpdu = glm::vec3(m_Radius * 2.0f * glm::pi<f32>(), 0.0f, 0.0f);
+                dpdv = glm::vec3(0.0f, 0.0f, -m_Radius * glm::pi<f32>());
+            }
+        }
+
+        glm::vec3 dndu(dpdu / m_Radius);
+        glm::vec3 dndv(dpdv / m_Radius);
+
+        glm::vec3 pError = glm::abs(p) * std::numeric_limits<f32>::max() * 5.0f;
+
+        intersect = SurfaceInteraction(p, pError, uv, -ray.direction, dpdu, dpdv, dndu, dndv, ray.time, this);
+        intersect.t = root;
 
         return true;
     }

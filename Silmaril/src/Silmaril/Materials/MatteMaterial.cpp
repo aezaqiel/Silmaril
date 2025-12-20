@@ -53,7 +53,7 @@ namespace Silmaril {
 
     void MatteMaterial::ComputeScatterFn(SurfaceInteraction& intersect) const
     {
-        intersect.bsdf = std::make_shared<SimpleDiffuseBSDF>(m_Color, intersect.n);
+        intersect.bsdf = std::make_shared<SimpleDiffuseBSDF>(m_Color, intersect.shading.n);
     }
 
 }

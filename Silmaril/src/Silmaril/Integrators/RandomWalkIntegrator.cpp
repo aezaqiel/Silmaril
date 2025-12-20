@@ -80,7 +80,7 @@ namespace Silmaril {
                 if (!hit || shadowIntersect.t > ls->distance - 0.0001f) {
                     glm::vec3 f = intersect.bsdf->f(wo, ls->wi);
                     if (glm::length(f) > 0) {
-                        L += f * ls->li * glm::abs(glm::dot(intersect.n, ls->wi)) / ls->pdf;
+                        L += f * ls->li * glm::abs(glm::dot(intersect.shading.n, ls->wi)) / ls->pdf;
                     }
                 }
             }
@@ -90,7 +90,7 @@ namespace Silmaril {
         if (bs && bs->pdf > 0) {
             Ray nextRay = intersect.SpawnRay(bs->wi);
             glm::vec3 indirect = Li(nextRay, scene, sampler, depth + 1);
-            L += bs->f * indirect * glm::abs(glm::dot(intersect.n, bs->wi)) / bs->pdf;
+            L += bs->f * indirect * glm::abs(glm::dot(intersect.shading.n, bs->wi)) / bs->pdf;
         }
 
         return L;

@@ -15,8 +15,8 @@ int main()
 {
     using namespace Silmaril;
 
-    u32 width = 1920;
-    u32 height = 1080;
+    u32 width = 400;
+    u32 height = 300;
     u32 samples = 128;
     u32 depth = 8;
 
