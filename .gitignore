@@ -1,5 +1,6 @@
 build/
 Silmaril/res/Assets/Bistro/
+Silmaril/res/Assets/Sponza/
 
 CMakeLists.txt.user
 CMakeCache.txt

@@ -7,22 +7,22 @@
 
 #include "Geometry/GeometricPrimitive.hpp"
 #include "Geometry/Sphere.hpp"
-#include "Geometry/Triangle.hpp"
+#include "Geometry/Model.hpp"
 #include "Geometry/BVH.hpp"
 
 #include "Materials/MatteMaterial.hpp"
 #include "Lights/PointLight.hpp"
 #include "Samplers/RandomSampler.hpp"
 
-#include "Loaders/MeshLoader.hpp"
+#include "Loaders/ModelLoader.hpp"
 
 int main()
 {
     using namespace Silmaril;
 
-    u32 width = 400;
-    u32 height = 300;
-    u32 samples = 32;
+    u32 width = 1920;
+    u32 height = 1080;
+    u32 samples = 1024;
     u32 depth = 8;
 
     std::println("Initializing Scene...");
@@ -30,26 +30,18 @@ int main()
     std::vector<std::shared_ptr<Primitive>> primitives;
     std::vector<std::shared_ptr<Light>> lights;
 
-    auto redMat = std::make_shared<MatteMaterial>(glm::vec3(0.8f, 0.2f, 0.2f));
-    auto floorMat = std::make_shared<MatteMaterial>(glm::vec3(0.8f));
-
-    auto mesh = MeshLoader::LoadOBJ("Assets/suzanne.obj");
-    if (mesh) {
-        auto triangles = Triangle::CreateTriangleMesh(mesh);
-        for (const auto& triangle : triangles) {
-            primitives.push_back(std::make_shared<GeometricPrimitive>(triangle, redMat));
-        }
+    auto model = ModelLoader::LoadOBJ("Assets/Sponza/sponza.obj");
+    if (model) {
+        auto modelPrimitives = model->CreatePrimitives();
+        primitives.insert(primitives.end(), modelPrimitives.begin(), modelPrimitives.end());
     } else {
-        std::println(std::cerr, "Mesh not found, falling back to sphere");
+        std::println(std::cerr, "Model not loaded, falling back to sphere");
 
         auto sphere = std::make_shared<Sphere>(glm::vec3(0.0f, 1.0f, 0.0f), 1.0f);
-        primitives.push_back(std::make_shared<GeometricPrimitive>(sphere, redMat));
+        primitives.push_back(std::make_shared<GeometricPrimitive>(sphere, std::make_shared<MatteMaterial>(glm::vec3(0.75f))));
     }
 
     std::println("Total Primitives: {}", primitives.size());
-
-    auto floorSphere = std::make_shared<Sphere>(glm::vec3(0.0f, -1010.0f, 0.0f), 1000.0f);
-    primitives.push_back(std::make_shared<GeometricPrimitive>(floorSphere, floorMat));
 
     std::println("Building BVH...");
     auto startBVH = std::chrono::steady_clock::now();
@@ -60,8 +52,9 @@ int main()
     std::chrono::duration<double> timeBVH = endBVH - startBVH;
     std::println("BVH built in {:.4f} seconds", timeBVH.count());
 
-    lights.push_back(std::make_shared<PointLight>(glm::vec3(5.0f, 10.0f, 5.0f), glm::vec3(800.0f)));
-    lights.push_back(std::make_shared<PointLight>(glm::vec3(-5.0f, 5.0f, -5.0f), glm::vec3(200.0f)));
+    lights.push_back(std::make_shared<PointLight>(glm::vec3(0.0f, 800.0f, 0.0f), glm::vec3(500000.0f)));
+    lights.push_back(std::make_shared<PointLight>(glm::vec3( 500.0f, 200.0f,  100.0f), glm::vec3(100000.0f)));
+    lights.push_back(std::make_shared<PointLight>(glm::vec3(-500.0f, 200.0f, -100.0f), glm::vec3(100000.0f)));
 
     std::println("Total Lights: {}", lights.size());
 
@@ -69,10 +62,10 @@ int main()
 
     auto film = std::make_shared<Film>(width, height);
 
-    glm::vec3 lookfrom(0.0f, 1.0f, 5.0f);
-    glm::vec3 lookat(0.0f, 0.0f, 0.0f);
+    glm::vec3 lookfrom(1100.0f, 180.0f, 0.0f);
+    glm::vec3 lookat(0.0f, 180.0f, 0.0f);
     glm::vec3 up(0.0f, 1.0f, 0.0f);
-    f32 fov = 60.0f;
+    f32 fov = 75.0f;
 
     auto camera = std::make_shared<PerspectiveCamera>(film, lookfrom, lookat, up, fov);
 

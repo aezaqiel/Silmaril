@@ -24,9 +24,11 @@ add_executable(Silmaril
     src/Silmaril/Geometry/GeometricPrimitive.cpp
     src/Silmaril/Geometry/Sphere.hpp
     src/Silmaril/Geometry/Sphere.cpp
-    src/Silmaril/Geometry/Mesh.hpp
     src/Silmaril/Geometry/Triangle.hpp
     src/Silmaril/Geometry/Triangle.cpp
+    src/Silmaril/Geometry/Mesh.hpp
+    src/Silmaril/Geometry/Model.hpp
+    src/Silmaril/Geometry/Model.cpp
     src/Silmaril/Geometry/BVH.hpp
     src/Silmaril/Geometry/BVH.cpp
 
@@ -38,13 +40,15 @@ add_executable(Silmaril
     src/Silmaril/Lights/PointLight.hpp
     src/Silmaril/Lights/PointLight.cpp
 
-    src/Silmaril/Loaders/MeshLoader.hpp
-    src/Silmaril/Loaders/MeshLoader.cpp
+    src/Silmaril/Loaders/ModelLoader.hpp
+    src/Silmaril/Loaders/ModelLoader.cpp
 
     src/Silmaril/Materials/BSDF.hpp
     src/Silmaril/Materials/Material.hpp
     src/Silmaril/Materials/MatteMaterial.hpp
     src/Silmaril/Materials/MatteMaterial.cpp
+    src/Silmaril/Materials/PBRMaterial.hpp
+    src/Silmaril/Materials/PBRMaterial.cpp
 
     src/Silmaril/Samplers/Sampler.hpp
     src/Silmaril/Samplers/Sampler.cpp
