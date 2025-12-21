@@ -26,7 +26,7 @@ namespace Silmaril {
         std::mutex printMutex;
 
         std::println("Integrator: Starting parallel render loop...");
-        auto loopStart = std::chrono::high_resolution_clock::now();
+        auto loopStart = std::chrono::steady_clock::now();
 
         std::for_each(std::execution::par, yCoords.begin(), yCoords.end(),
             [&](u32 y) {

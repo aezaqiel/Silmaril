@@ -90,9 +90,9 @@ int main()
 
     RandomWalkIntegrator integrator(camera, sampler, depth);
 
-    auto startRender = std::chrono::high_resolution_clock::now();
+    auto startRender = std::chrono::steady_clock::now();
     integrator.Render(scene);
-    auto endRender = std::chrono::high_resolution_clock::now();
+    auto endRender = std::chrono::steady_clock::now();
     std::chrono::duration<double> timeRender = endRender - startRender;
 
     std::println("Total Execution Time (Render + Save): {:.4f} seconds", timeRender.count());

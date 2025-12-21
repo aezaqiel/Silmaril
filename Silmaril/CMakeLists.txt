@@ -53,6 +53,11 @@ add_executable(Silmaril
 
     src/Silmaril/Scene/Scene.hpp
 
+    src/Silmaril/Textures/Texture.hpp
+    src/Silmaril/Textures/SolidTexture.hpp
+    src/Silmaril/Textures/ImageTexture.hpp
+    src/Silmaril/Textures/ImageTexture.cpp
+
     src/Platform/STBImpl.cpp
 )
 
