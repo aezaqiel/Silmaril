@@ -14,7 +14,8 @@ namespace Silmaril {
         WindowClosed, WindowResized, WindowMinimize,
         KeyPressed, KeyReleased, KeyTyped,
         MouseButtonPressed, MouseButtonReleased,
-        MouseMoved, MouseScrolled
+        MouseMoved, MouseScrolled,
+        PBRTRender
     };
 
     enum EventCategory : i32
@@ -24,7 +25,8 @@ namespace Silmaril {
         EventCategoryInput          = BIT(1),
         EventCategoryKeyboard       = BIT(2),
         EventCategoryMouseButton    = BIT(3),
-        EventCategoryMouse          = BIT(4)
+        EventCategoryMouse          = BIT(4),
+        EventCategoryPBRT           = BIT(5)
     };
 
     struct Event
@@ -203,6 +205,24 @@ namespace Silmaril {
         }
 
         inline static constexpr EventType GetStaticType() { return EventType::MouseScrolled; }
+        virtual constexpr EventType GetType() const override { return GetStaticType(); }
+    };
+
+    struct PBRTRenderEvent final : public Event
+    {
+        u32 x;
+        u32 y;
+        u32 w;
+        u32 h;
+
+        constexpr explicit PBRTRenderEvent(u32 x, u32 y, u32 w, u32 h) noexcept
+            : x(x), y(y), w(w), h(h)
+        {
+        }
+
+        virtual constexpr i32 GetEventCategory() const override { return EventCategory::EventCategoryPBRT; }
+
+        inline static constexpr EventType GetStaticType() { return EventType::PBRTRender; }
         virtual constexpr EventType GetType() const override { return GetStaticType(); }
     };
 

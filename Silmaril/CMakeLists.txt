@@ -45,6 +45,7 @@ add_executable(Silmaril
     src/Silmaril/PBRT/Geometry/BVH.cpp
 
     src/Silmaril/PBRT/Integrators/Integrator.hpp
+    src/Silmaril/PBRT/Integrators/Integrator.cpp
     src/Silmaril/PBRT/Integrators/RandomWalkIntegrator.hpp
     src/Silmaril/PBRT/Integrators/RandomWalkIntegrator.cpp
 
@@ -76,6 +77,9 @@ add_executable(Silmaril
 
     src/Silmaril/PBRT/PBRT.hpp
     src/Silmaril/PBRT/PBRT.cpp
+
+    src/Silmaril/Renderer/Renderer.hpp
+    src/Silmaril/Renderer/Renderer.cpp
 
     src/Platform/STBImpl.cpp
 )

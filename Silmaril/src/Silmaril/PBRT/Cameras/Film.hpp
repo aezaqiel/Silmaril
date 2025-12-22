@@ -12,6 +12,7 @@ namespace Silmaril {
 
         inline u32 GetWidth() const { return m_Width; }
         inline u32 GetHeight() const { return m_Height; }
+        inline std::vector<glm::vec3> GetPixels() const { return m_Pixels; }
 
         void SetPixel(u32 x, u32 y, const glm::vec3& color);
         void AddSample(u32 x, u32 y, const glm::vec3& L);

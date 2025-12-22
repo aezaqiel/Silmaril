@@ -13,7 +13,15 @@ namespace Silmaril {
     class RandomWalkIntegrator final : public Integrator
     {
     public:
-        RandomWalkIntegrator(const std::shared_ptr<Camera>& camera, const std::shared_ptr<Sampler>& sampler, usize depth);
+        struct Config
+        {
+            std::shared_ptr<Camera> camera;
+            std::shared_ptr<Sampler> sampler;
+            u32 depth;
+            u32 tile;
+        };
+    public:
+        RandomWalkIntegrator(const Config& config);
         ~RandomWalkIntegrator() = default;
 
         virtual void Render(const Scene& scene) override;
@@ -34,9 +42,8 @@ namespace Silmaril {
     private:
         std::shared_ptr<Camera> m_Camera;
         std::shared_ptr<Sampler> m_Sampler;
-        usize m_MaxDepth { 1 };
 
-        inline static constexpr u32 s_TileSize { 16 };
+        u32 m_MaxDepth { 1 };
     };
 
 }

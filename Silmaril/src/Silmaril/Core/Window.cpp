@@ -51,8 +51,11 @@ namespace Silmaril {
 
             i32 w, h;
             glfwGetFramebufferSize(m_Window, &w, &h);
+
             m_Data.width = static_cast<u32>(w);
             m_Data.height = static_cast<u32>(h);
+
+            glViewport(0, 0, w, h);
         }
 
         glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -158,12 +161,9 @@ namespace Silmaril {
         }
     }
 
-    std::vector<const char*> Window::GetRequiredVulkanInstanceExtensions()
+    void Window::SwapBuffers()
     {
-        u32 count = 0;
-        const char** extensions = glfwGetRequiredInstanceExtensions(&count);
-
-        return std::vector<const char*>(extensions, extensions + count);
+        glfwSwapBuffers(m_Window);
     }
 
     void Window::PollEvents()

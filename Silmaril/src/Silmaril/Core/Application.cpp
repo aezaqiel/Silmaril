@@ -10,7 +10,13 @@ namespace Silmaril {
         m_Window = std::make_unique<Window>(config.width, config.height, "Silmaril");
         m_Window->BindEventCallback(BIND_EVENT_FN(Application::DispatchEvents));
 
-        m_PBRT = std::make_unique<PBRT>(m_Config.pbrt);
+        m_Renderer = std::make_unique<Renderer>(config.renderer);
+
+        m_PBRT = std::make_unique<PBRT>(config.pbrt);
+        m_PBRT->SetTileRenderCallback([&](u32 x, u32 y, u32 w, u32 h) {
+            std::scoped_lock<std::mutex> lock(m_RenderQueueMutex);
+            m_RenderQueue.emplace_back(x, y, w, h);
+        });
     }
 
     Application::~Application()
@@ -27,7 +33,22 @@ namespace Silmaril {
         while (m_Running) {
             Window::PollEvents();
 
+            {
+                std::scoped_lock<std::mutex> lock(m_RenderQueueMutex);
+                while (!m_RenderQueue.empty()) {
+                    const auto& tile = m_RenderQueue.front();
+                    const auto& pixels = m_PBRT->GetFilm()->GetPixels();
+
+                    m_Renderer->Update(pixels, tile.x, tile.y, tile.w, tile.h);
+
+                    m_RenderQueue.pop_front();
+                }
+            }
+
             if (!m_Minimized) {
+                m_Renderer->Draw();
+
+                m_Window->SwapBuffers();
             }
         }
     }

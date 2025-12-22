@@ -10,6 +10,8 @@ int main()
     constexpr u32 SAMPLES = 32;
     constexpr u32 DEPTH = 8;
 
+    constexpr u32 TILE_SIZE = 32;
+
     Silmaril::Application* app = new Silmaril::Application({
         .width = IMAGE_WIDTH,
         .height = IMAGE_HEIGHT,
@@ -20,6 +22,7 @@ int main()
             .height = IMAGE_HEIGHT,
             .samples = SAMPLES,
             .depth = DEPTH,
+            .tile = TILE_SIZE,
 
             .model = "Assets/Sponza/sponza.obj",
 
@@ -27,6 +30,12 @@ int main()
             .lookat = { 0.0f, 180.0f, 0.0f },
             .up = { 0.0f, 1.0f, 0.0f },
             .fov = 90.0f
+        },
+
+        .renderer = {
+            .width = IMAGE_WIDTH,
+            .height = IMAGE_HEIGHT,
+            .tile = TILE_SIZE
         }
     });
 

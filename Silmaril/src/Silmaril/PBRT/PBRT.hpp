@@ -17,6 +17,7 @@ namespace Silmaril {
             u32 height;
             u32 samples;
             u32 depth;
+            u32 tile;
 
             std::string model;
 
@@ -30,7 +31,10 @@ namespace Silmaril {
         PBRT(const Config& config);
         ~PBRT();
 
+        inline const std::shared_ptr<Film>& GetFilm() const { return m_Film; }
+
         void Render();
+        void SetTileRenderCallback(Integrator::OnRenderCallback callback);
 
     private:
         void InitializeIntegrator();

@@ -11,8 +11,8 @@
 
 namespace Silmaril {
 
-    RandomWalkIntegrator::RandomWalkIntegrator(const std::shared_ptr<Camera>& camera, const std::shared_ptr<Sampler>& sampler, usize depth)
-        : m_Camera(camera), m_Sampler(sampler), m_MaxDepth(depth)
+    RandomWalkIntegrator::RandomWalkIntegrator(const Config& config)
+        : Integrator(config.tile), m_Camera(config.camera), m_Sampler(config.sampler), m_MaxDepth(config.depth)
     {
     }
 
@@ -21,8 +21,8 @@ namespace Silmaril {
         u32 width = m_Camera->GetFilm().GetWidth();
         u32 height = m_Camera->GetFilm().GetHeight();
 
-        u32 tilesX = (width + s_TileSize - 1) / s_TileSize;
-        u32 tilesY = (height + s_TileSize - 1) / s_TileSize;
+        u32 tilesX = (width + m_TileSize - 1) / m_TileSize;
+        u32 tilesY = (height + m_TileSize - 1) / m_TileSize;
         u32 totalTiles = tilesX * tilesY;
 
         std::vector<Tile> tiles;
@@ -30,18 +30,22 @@ namespace Silmaril {
 
         for (u32 y = 0; y < tilesY; ++y) {
             for (u32 x = 0; x < tilesX; ++x) {
-                u32 x0 = x * s_TileSize;
-                u32 y0 = y * s_TileSize;
-                u32 x1 = std::min(x0 + s_TileSize, width);
-                u32 y1 = std::min(y0 + s_TileSize, height);
+                u32 x0 = x * m_TileSize;
+                u32 y0 = y * m_TileSize;
+                u32 x1 = std::min(x0 + m_TileSize, width);
+                u32 y1 = std::min(y0 + m_TileSize, height);
                 tiles.push_back({ x0, y0, x1 - x0, y1 - y0 });
             }
         }
 
-        LOG_INFO("Rendering {} tiles ({}x{})", totalTiles, s_TileSize, s_TileSize);
+        LOG_INFO("Rendering {} tiles ({}x{})", totalTiles, m_TileSize, m_TileSize);
 
         for (const Tile& tile : tiles) {
             RenderTile(tile, scene);
+
+            if (m_RenderCallback) {
+                m_RenderCallback(tile.x, tile.y, tile.w, tile.h);
+            }
         }
 
         m_Camera->GetFilm().Write("Output.png");

@@ -3,6 +3,8 @@
 #include "Events.hpp"
 #include "Window.hpp"
 
+#include "Silmaril/Renderer/Renderer.hpp"
+
 #include "Silmaril/PBRT/PBRT.hpp"
 
 namespace Silmaril {
@@ -17,6 +19,7 @@ namespace Silmaril {
             std::string title;
 
             PBRT::Config pbrt;
+            Renderer::Config renderer;
         };
 
     public:
@@ -35,9 +38,13 @@ namespace Silmaril {
         bool m_Minimized { false };
 
         std::unique_ptr<Window> m_Window;
+        std::unique_ptr<Renderer> m_Renderer;
 
         std::unique_ptr<PBRT> m_PBRT;
         std::jthread m_PBRTThread;
+
+        std::deque<PBRTRenderEvent> m_RenderQueue;
+        std::mutex m_RenderQueueMutex;
     };
 
 }

@@ -16,6 +16,8 @@ namespace Silmaril {
         Window(u32 width, u32 height, const std::string& title);
         ~Window();
 
+        void SwapBuffers();
+
         inline std::string GetTitle() const { return m_Data.title; }
         inline u32 GetWidth() const { return m_Data.width; }
         inline u32 GetHeight() const { return m_Data.height; }
@@ -26,8 +28,6 @@ namespace Silmaril {
         {
             m_Data.callback = std::forward<EventCallbackFn>(callback);
         }
-
-        static std::vector<const char*> GetRequiredVulkanInstanceExtensions();
 
     protected:
         static void PollEvents();

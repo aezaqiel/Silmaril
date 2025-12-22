@@ -4,16 +4,16 @@
 
 #include "Silmaril/Core/Logger.hpp"
 
-#include "Silmaril/PBRT/Cameras/PerspectiveCamera.hpp"
-#include "Silmaril/PBRT/Samplers/RandomSampler.hpp"
-#include "Silmaril/PBRT/Integrators/RandomWalkIntegrator.hpp"
+#include "Cameras/PerspectiveCamera.hpp"
+#include "Samplers/RandomSampler.hpp"
+#include "Integrators/RandomWalkIntegrator.hpp"
 
-#include "Silmaril/PBRT/Loaders/ModelLoader.hpp"
-#include "Silmaril/PBRT/Geometry/GeometricPrimitive.hpp"
-#include "Silmaril/PBRT/Geometry/Sphere.hpp"
-#include "Silmaril/PBRT/Geometry/BVH.hpp"
-#include "Silmaril/PBRT/Materials/MatteMaterial.hpp"
-#include "Silmaril/PBRT/Lights/PointLight.hpp"
+#include "Loaders/ModelLoader.hpp"
+#include "Geometry/GeometricPrimitive.hpp"
+#include "Geometry/Sphere.hpp"
+#include "Geometry/BVH.hpp"
+#include "Materials/MatteMaterial.hpp"
+#include "Lights/PointLight.hpp"
 
 namespace Silmaril {
 
@@ -53,6 +53,11 @@ namespace Silmaril {
         }
     }
 
+    void PBRT::SetTileRenderCallback(Integrator::OnRenderCallback callback)
+    {
+        m_Integrator->SetRenderCallback(callback);
+    }
+
     void PBRT::InitializeIntegrator()
     {
         LOG_INFO("Initializing Integrator...");
@@ -69,7 +74,12 @@ namespace Silmaril {
 
         m_Sampler = std::make_shared<RandomSampler>(m_Config.samples);
 
-        m_Integrator = std::make_unique<RandomWalkIntegrator>(m_Camera, m_Sampler, m_Config.depth);
+        m_Integrator = std::make_unique<RandomWalkIntegrator>(RandomWalkIntegrator::Config{
+            m_Camera,
+            m_Sampler,
+            m_Config.depth,
+            m_Config.tile
+        });
     }
 
     void PBRT::InitializeScene()
