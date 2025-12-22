@@ -15,6 +15,8 @@ namespace Silmaril {
 
         virtual void Render(const Scene& scene) = 0;
 
+        virtual void Cancel() { m_CancelRender = true; }
+
         inline void SetRenderCallback(OnRenderCallback callback)
         {
             m_RenderCallback = callback;
@@ -23,6 +25,8 @@ namespace Silmaril {
     protected:
         u32 m_TileSize { 0 };
         OnRenderCallback m_RenderCallback { nullptr };
+
+        std::atomic<bool> m_CancelRender { false };
     };
 
 }

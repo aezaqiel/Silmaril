@@ -60,6 +60,8 @@ namespace Silmaril {
 
         dispatcher.Dispatch<WindowClosedEvent>([&](const WindowClosedEvent& e) -> bool {
             m_Running = false;
+            m_PBRT->RequestStop();
+
             return true;
         });
 

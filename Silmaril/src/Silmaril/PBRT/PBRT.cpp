@@ -47,7 +47,7 @@ namespace Silmaril {
             auto renderEnd = std::chrono::steady_clock::now();
 
             std::chrono::duration<f64> timeRender = renderEnd - renderStart;
-            LOG_INFO("Total Execution Time (Render + Save): {:.4f} seconds", timeRender.count());
+            LOG_INFO("Integrator Execution Time: {:.4f} seconds", timeRender.count());
         } else {
             LOG_ERROR("Integrator || Scene not set");
         }
@@ -56,6 +56,11 @@ namespace Silmaril {
     void PBRT::SetTileRenderCallback(Integrator::OnRenderCallback callback)
     {
         m_Integrator->SetRenderCallback(callback);
+    }
+
+    void PBRT::RequestStop()
+    {
+        m_Integrator->Cancel();
     }
 
     void PBRT::InitializeIntegrator()

@@ -35,6 +35,7 @@ namespace Silmaril {
 
         void Render();
         void SetTileRenderCallback(Integrator::OnRenderCallback callback);
+        void RequestStop();
 
     private:
         void InitializeIntegrator();

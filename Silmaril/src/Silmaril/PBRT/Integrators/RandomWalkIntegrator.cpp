@@ -18,6 +18,8 @@ namespace Silmaril {
 
     void RandomWalkIntegrator::Render(const Scene& scene)
     {
+        m_CancelRender = false;
+
         u32 width = m_Camera->GetFilm().GetWidth();
         u32 height = m_Camera->GetFilm().GetHeight();
 
@@ -41,6 +43,11 @@ namespace Silmaril {
         LOG_INFO("Rendering {} tiles ({}x{})", totalTiles, m_TileSize, m_TileSize);
 
         for (const Tile& tile : tiles) {
+            if (m_CancelRender) {
+                LOG_WARN("In-progress Render Cancelled");
+                return;
+            }
+
             RenderTile(tile, scene);
 
             if (m_RenderCallback) {
@@ -48,7 +55,9 @@ namespace Silmaril {
             }
         }
 
-        m_Camera->GetFilm().Write("Output.png");
+        if (!m_CancelRender) {
+            m_Camera->GetFilm().Write("Output.png");
+        }
     }
 
     void RandomWalkIntegrator::RenderTile(const Tile& tile, const Scene& scene)
