@@ -10,6 +10,8 @@
 
 #include "Silmaril/Materials/PBRMaterial.hpp"
 
+#include "Silmaril/Core/Logger.hpp"
+
 #include <PathConfig.inl>
 
 namespace Silmaril {
@@ -52,13 +54,13 @@ namespace Silmaril {
 
         if (!reader.ParseFromFile(path, config)) {
             if (!reader.Error().empty()) {
-                std::println(std::cerr, "TinyObjReader: {}", reader.Error());
+                LOG_ERROR("TinyObjReader: {}", reader.Error());
             }
             return nullptr;
         }
 
         if (!reader.Warning().empty()) {
-            std::println(std::clog, "TinyObjReader: {}", reader.Warning());
+            LOG_WARN("TinyObjReader: {}", reader.Warning());
         }
 
         const auto& attrib = reader.GetAttrib();
@@ -137,7 +139,7 @@ namespace Silmaril {
 
         model->mesh = std::move(mesh);
 
-        std::println("Loaded model: {} ({} vertices, {} shapes, {} materials)", filename, model->mesh->p.size(), shapes.size(), materials.size());
+        LOG_INFO("Loaded model: {} ({} vertices, {} shapes, {} materials)", filename, model->mesh->p.size(), shapes.size(), materials.size());
 
         return model;
     }

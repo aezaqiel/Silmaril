@@ -4,5 +4,6 @@ namespace PathConfig {
 
     inline static constexpr std::string_view OutputDir = "@OUTPUT_FOLDER@";
     inline static constexpr std::string_view ResDir = "@RES_FOLDER@";
+    inline static constexpr std::string_view LogDir = "@LOG_FOLDER@";
 
 }

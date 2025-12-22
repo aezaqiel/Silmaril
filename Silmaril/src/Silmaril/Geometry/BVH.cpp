@@ -1,5 +1,7 @@
 #include "BVH.hpp"
 
+#include "Silmaril/Core/Logger.hpp"
+
 namespace Silmaril {
 
     namespace {
@@ -124,11 +126,11 @@ namespace Silmaril {
 
         auto root = BuildBVH(primitives, 0, stats);
 
-        std::println("BVH Construction Metrics");
-        std::println(" - Total Primitives: {}", primitives.size());
-        std::println(" - Internal Nodes: {}", stats.nodes);
-        std::println(" - Leaf Nodes: {}", stats.leaves);
-        std::println(" - Max Tree Depth: {}", stats.depth);
+        LOG_INFO("BVH Construction Metrics");
+        LOG_INFO(" - Total Primitives: {}", primitives.size());
+        LOG_INFO(" - Internal Nodes: {}", stats.nodes);
+        LOG_INFO(" - Leaf Nodes: {}", stats.leaves);
+        LOG_INFO(" - Max Tree Depth: {}", stats.depth);
 
         return root;
     }

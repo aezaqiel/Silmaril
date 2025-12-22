@@ -2,6 +2,8 @@
 
 #include <stb_image_write.h>
 
+#include "Silmaril/Core/Logger.hpp"
+
 #include "PathConfig.inl"
 
 namespace Silmaril {
@@ -72,9 +74,9 @@ namespace Silmaril {
         );
 
         if (success) {
-                std::println("Image saved {}", filename);
+                LOG_INFO("Image saved {}", filename);
         } else {
-                std::println(std::cerr, "Failed to save image");
+                LOG_ERROR("Failed to save image");
         }
     }
 

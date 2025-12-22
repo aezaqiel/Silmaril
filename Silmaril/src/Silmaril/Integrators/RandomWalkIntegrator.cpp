@@ -7,6 +7,8 @@
 #include "Silmaril/Materials/Material.hpp"
 #include "Silmaril/Materials/BSDF.hpp"
 
+#include "Silmaril/Core/Logger.hpp"
+
 namespace Silmaril {
 
     RandomWalkIntegrator::RandomWalkIntegrator(const std::shared_ptr<Camera>& camera, const std::shared_ptr<Sampler>& sampler, usize depth)
@@ -25,7 +27,7 @@ namespace Silmaril {
         std::atomic<u32> completedRows = 0;
         std::mutex printMutex;
 
-        std::println("Integrator: Starting parallel render loop...");
+        LOG_INFO("Integrator: Starting render loop...");
         auto loopStart = std::chrono::steady_clock::now();
 
         std::for_each(std::execution::par, yCoords.begin(), yCoords.end(),
@@ -58,19 +60,15 @@ namespace Silmaril {
                     f32 percentage = 100.0f * static_cast<f32>(finished) / static_cast<f32>(height);
                     u32 barWidth = 50;
                     u32 pos = static_cast<u32>(percentage / 100.0f * barWidth);
-
-                    std::print(std::cout, "\rProgress: [{:<{}}] {:>5.1f}%", std::string(pos, '=') + (pos < barWidth ? ">" : ""), barWidth, percentage);
-                    std::cout.flush();
                 }
             }
         );
-        std::println(std::cout, "");
 
         auto loopEnd = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> loopTime = loopEnd - loopStart;
-        std::println("Integrator: Compute finished in {:.4f} seconds", loopTime.count());
+        LOG_INFO("Integrator: Compute finished in {:.4f} seconds", loopTime.count());
 
-        std::println("Integrator: Saving image...");
+        LOG_INFO("Integrator: Saving image...");
         m_Camera->GetFilm().Write("Output.png");
     }
 

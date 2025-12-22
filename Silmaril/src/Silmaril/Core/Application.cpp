@@ -2,6 +2,8 @@
 
 #include <glm/gtx/string_cast.hpp>
 
+#include "Logger.hpp"
+
 #include "Silmaril/Cameras/PerspectiveCamera.hpp"
 #include "Silmaril/Samplers/RandomSampler.hpp"
 #include "Silmaril/Integrators/RandomWalkIntegrator.hpp"
@@ -20,15 +22,15 @@ namespace Silmaril {
     {
         InitializeIntegrator();
 
-        std::println("Integrator Settings");
-        std::println(" - Resolution: {}x{}", m_Config.width, m_Config.height);
-        std::println(" - samples:    {}", m_Config.samples);
-        std::println(" - depth:      {}", m_Config.depth);
+        LOG_INFO("Integrator Settings");
+        LOG_INFO(" - Resolution: {}x{}", m_Config.width, m_Config.height);
+        LOG_INFO(" - samples:    {}", m_Config.samples);
+        LOG_INFO(" - depth:      {}", m_Config.depth);
 
-        std::println("Camera Settings:");
-        std::println(" - Position:   {}", glm::to_string(m_Config.lookfrom));
-        std::println(" - LookAt:     {}", glm::to_string(m_Config.lookat));
-        std::println(" - FOV:        {:.2f}", m_Config.fov);
+        LOG_INFO("Camera Settings:");
+        LOG_INFO(" - Position:   {}", glm::to_string(m_Config.lookfrom));
+        LOG_INFO(" - LookAt:     {}", glm::to_string(m_Config.lookat));
+        LOG_INFO(" - FOV:        {:.2f}", m_Config.fov);
 
         InitializeScene();
     }
@@ -44,12 +46,12 @@ namespace Silmaril {
         auto renderEnd = std::chrono::steady_clock::now();
 
         std::chrono::duration<f64> timeRender = renderEnd - renderStart;
-        std::println("Total Execution Time (Render + Save): {:.4f} seconds", timeRender.count());
+        LOG_INFO("Total Execution Time (Render + Save): {:.4f} seconds", timeRender.count());
     }
 
     void Application::InitializeIntegrator()
     {
-        std::println("Initializing Integrator...");
+        LOG_INFO("Initializing Integrator...");
 
         m_Film = std::make_shared<Film>(m_Config.width, m_Config.height);
 
@@ -68,36 +70,36 @@ namespace Silmaril {
 
     void Application::InitializeScene()
     {
-        std::println("Initializing Scene...");
+        LOG_INFO("Initializing Scene...");
 
         std::vector<std::shared_ptr<Primitive>> primitives;
         std::vector<std::shared_ptr<Light>> lights;
 
-        auto model = ModelLoader::LoadOBJ("Assets/Sponza/sponza.obj");
+        auto model = ModelLoader::LoadOBJ(m_Config.model);
         if (model) {
             auto modelPrimitives = model->CreatePrimitives();
             primitives.insert(primitives.end(), modelPrimitives.begin(), modelPrimitives.end());
         } else {
-            std::println(std::cerr, "Model not loaded, falling back to sphere");
+            LOG_WARN("No model loaded, falling back to sphere");
 
             auto sphere = std::make_shared<Sphere>(glm::vec3(0.0f, 1.0f, 0.0f), 1.0f);
             primitives.push_back(std::make_shared<GeometricPrimitive>(sphere, std::make_shared<MatteMaterial>(glm::vec3(0.75f))));
         }
 
-        std::println("Building aggregate BVH...");
+        LOG_INFO("Building aggregate BVH...");
         auto BVHStart = std::chrono::steady_clock::now();
         auto bvh = BVH::Create(primitives);
         auto BVHEnd = std::chrono::steady_clock::now();
 
         std::chrono::duration<f64> timeBVH = BVHEnd - BVHStart;
-        std::println("BVH built in {:.4f} seconds", timeBVH.count());
+        LOG_INFO("BVH built in {:.4f} seconds", timeBVH.count());
 
         lights.push_back(std::make_shared<PointLight>(glm::vec3(0.0f, 800.0f, 0.0f), glm::vec3(500000.0f)));
         lights.push_back(std::make_shared<PointLight>(glm::vec3( 500.0f, 200.0f,  100.0f), glm::vec3(100000.0f)));
         lights.push_back(std::make_shared<PointLight>(glm::vec3(-500.0f, 200.0f, -100.0f), glm::vec3(100000.0f)));
 
-        std::println("Total Primitives: {}", primitives.size());
-        std::println("Total Lights: {}", lights.size());
+        LOG_INFO("Total Primitives: {}", primitives.size());
+        LOG_INFO("Total Lights: {}", lights.size());
 
         m_Scene = std::make_unique<Scene>(bvh, lights);
     }

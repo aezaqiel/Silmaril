@@ -1,12 +1,15 @@
+#include "Core/Logger.hpp"
 #include "Core/Application.hpp"
 
 int main()
 {
+    Silmaril::Logger::Init();
+
     Silmaril::Application* app = new Silmaril::Application({
         .width = 400,
         .height = 300,
-        .samples = 32,
-        .depth = 8,
+        .samples = 16,
+        .depth = 4,
 
         .model = "Assets/Sponza/sponza.obj",
 
@@ -18,4 +21,6 @@ int main()
 
     app->Run();
     delete app;
+
+    Silmaril::Logger::Shutdown();
 }

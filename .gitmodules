@@ -10,3 +10,6 @@
 [submodule "Silmaril/res/Assets/Sponza"]
 	path = Silmaril/res/Assets/Sponza
 	url = https://github.com/jimmiebergmann/Sponza.git
+[submodule "Silmaril/thirdparty/spdlog"]
+	path = Silmaril/thirdparty/spdlog
+	url = https://github.com/aezaqiel/spdlog

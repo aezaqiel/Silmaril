@@ -2,6 +2,8 @@
 
 #include <stb_image.h>
 
+#include "Silmaril/Core/Logger.hpp"
+
 #include <PathConfig.inl>
 
 namespace Silmaril {
@@ -69,9 +71,9 @@ namespace Silmaril {
             }
 
             stbi_image_free(data);
-            std::println("Loaded texture: {} ({}, {})", filename, m_Width, m_Height);
+            LOG_INFO("Loaded texture: {} ({}, {})", filename, m_Width, m_Height);
         } else {
-            std::println(std::cerr, "Failed to load texture: {}", filename);
+            LOG_ERROR("Failed to load texture: {}", filename);
 
             m_Width = 1;
             m_Height = 1;
@@ -96,9 +98,9 @@ namespace Silmaril {
             std::memcpy(m_Data.data(), data, m_Data.size());
 
             stbi_image_free(data);
-            std::println("Loaded scalar texture: {}, ({}, {})", filename, m_Width, m_Height);
+            LOG_INFO("Loaded scalar texture: {}, ({}, {})", filename, m_Width, m_Height);
         } else {
-            std::println(std::cerr, "Failed to load scalar texture: {}", filename);
+            LOG_ERROR("Failed to load scalar texture: {}", filename);
 
             m_Width = 1;
             m_Height = 1;

@@ -1,5 +1,6 @@
 add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/tinyobjloader)
+add_subdirectory(thirdparty/spdlog)
 
 add_executable(Silmaril
     src/Silmaril/Main.cpp
@@ -20,6 +21,8 @@ add_executable(Silmaril
 
     src/Silmaril/Core/Application.hpp
     src/Silmaril/Core/Application.cpp
+    src/Silmaril/Core/Logger.hpp
+    src/Silmaril/Core/Logger.cpp
 
     src/Silmaril/Geometry/Shape.hpp
     src/Silmaril/Geometry/Primitive.hpp
@@ -79,6 +82,7 @@ target_link_libraries(Silmaril
 PRIVATE
     glm
     tinyobjloader
+    spdlog
 )
 
 target_compile_definitions(Silmaril
@@ -94,6 +98,7 @@ PRIVATE
 
 file(TO_CMAKE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/render OUTPUT_FOLDER)
 file(TO_CMAKE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/res RES_FOLDER)
+file(TO_CMAKE_PATH ${CMAKE_CURRENT_BINARY_DIR}/log LOG_FOLDER)
 
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/PathConfig.inl
