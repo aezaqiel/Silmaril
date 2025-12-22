@@ -7,8 +7,6 @@
 #include "Silmaril/Materials/Material.hpp"
 #include "Silmaril/Materials/BSDF.hpp"
 
-#include "Silmaril/Core/Logger.hpp"
-
 namespace Silmaril {
 
     RandomWalkIntegrator::RandomWalkIntegrator(const std::shared_ptr<Camera>& camera, const std::shared_ptr<Sampler>& sampler, usize depth)
@@ -21,54 +19,30 @@ namespace Silmaril {
         u32 width = m_Camera->GetFilm().GetWidth();
         u32 height = m_Camera->GetFilm().GetHeight();
 
-        std::vector<u32> yCoords(height);
-        std::iota(yCoords.begin(), yCoords.end(), 0);
+        for (u32 y = 0; y < height; ++y) {
+            auto sampler = m_Sampler->Clone();
 
-        std::atomic<u32> completedRows = 0;
-        std::mutex printMutex;
+            for (u32 x = 0; x < width; ++x) {
+                sampler->StartPixel(x, y);
+                glm::vec3 accumulator(0.0f);
 
-        LOG_INFO("Integrator: Starting render loop...");
-        auto loopStart = std::chrono::steady_clock::now();
+                while (sampler->StartNextSample()) {
+                    CameraSample cs;
+                    glm::vec2 offset = sampler->Get2D();
+                    cs.pFilm = glm::vec2(x, y) + offset;
 
-        std::for_each(std::execution::par, yCoords.begin(), yCoords.end(),
-            [&](u32 y) {
-                auto sampler = m_Sampler->Clone();
+                    Ray ray = m_Camera->GenerateRay(cs);
 
-                for (u32 x = 0; x < width; ++x) {
-                    sampler->StartPixel(x, y);
-                    glm::vec3 accumulator(0.0f);
-
-                    while (sampler->StartNextSample()) {
-                        CameraSample cs;
-                        glm::vec2 offset = sampler->Get2D();
-                        cs.pFilm = glm::vec2(x, y) + offset;
-
-                        Ray ray = m_Camera->GenerateRay(cs);
-
-                        accumulator += Li(ray, scene, *sampler, 0);
-                    }
-
-                    accumulator /= static_cast<f32>(sampler->GetSPP());
-                    m_Camera->GetFilm().SetPixel(x, y, accumulator);
+                    accumulator += Li(ray, scene, *sampler, 0);
                 }
 
-                u32 finished = ++completedRows;
-
-                if (finished % std::max(1u, height / 100) == 0 || finished == height) {
-                    std::scoped_lock lock(printMutex);
-                    
-                    f32 percentage = 100.0f * static_cast<f32>(finished) / static_cast<f32>(height);
-                    u32 barWidth = 50;
-                    u32 pos = static_cast<u32>(percentage / 100.0f * barWidth);
-                }
+                accumulator /= static_cast<f32>(sampler->GetSPP());
+                m_Camera->GetFilm().SetPixel(x, y, accumulator);
             }
-        );
+        }
 
         auto loopEnd = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double> loopTime = loopEnd - loopStart;
-        LOG_INFO("Integrator: Compute finished in {:.4f} seconds", loopTime.count());
 
-        LOG_INFO("Integrator: Saving image...");
         m_Camera->GetFilm().Write("Output.png");
     }
 

@@ -16,3 +16,6 @@
 [submodule "Silmaril/thirdparty/glfw"]
 	path = Silmaril/thirdparty/glfw
 	url = https://github.com/glfw/glfw
+[submodule "Silmaril/thirdparty/glad"]
+	path = Silmaril/thirdparty/glad
+	url = https://github.com/aezaqiel/glad

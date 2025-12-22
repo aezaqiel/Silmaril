@@ -20,6 +20,9 @@ namespace Silmaril {
     Application::Application(const Config& config)
         : m_Config(config)
     {
+        m_Window = std::make_unique<Window>(config.width, config.height, "Silmaril");
+        m_Window->BindEventCallback(BIND_EVENT_FN(Application::DispatchEvents));
+
         InitializeIntegrator();
 
         LOG_INFO("Integrator Settings");
@@ -41,12 +44,23 @@ namespace Silmaril {
 
     void Application::Run()
     {
-        auto renderStart = std::chrono::steady_clock::now();
-        m_Integrator->Render(*m_Scene);
-        auto renderEnd = std::chrono::steady_clock::now();
+        std::jthread render = std::jthread([&] {
+            LOG_INFO("Render Thread Spawned");
 
-        std::chrono::duration<f64> timeRender = renderEnd - renderStart;
-        LOG_INFO("Total Execution Time (Render + Save): {:.4f} seconds", timeRender.count());
+            auto renderStart = std::chrono::steady_clock::now();
+            m_Integrator->Render(*m_Scene);
+            auto renderEnd = std::chrono::steady_clock::now();
+
+            std::chrono::duration<f64> timeRender = renderEnd - renderStart;
+            LOG_INFO("Total Execution Time (Render + Save): {:.4f} seconds", timeRender.count());
+        });
+
+        while (m_Running) {
+            Window::PollEvents();
+
+            if (!m_Minimized) {
+            }
+        }
     }
 
     void Application::InitializeIntegrator()
@@ -86,7 +100,7 @@ namespace Silmaril {
             primitives.push_back(std::make_shared<GeometricPrimitive>(sphere, std::make_shared<MatteMaterial>(glm::vec3(0.75f))));
         }
 
-        LOG_INFO("Building aggregate BVH...");
+        LOG_INFO("Building Aggregate BVH...");
         auto BVHStart = std::chrono::steady_clock::now();
         auto bvh = BVH::Create(primitives);
         auto BVHEnd = std::chrono::steady_clock::now();
@@ -107,6 +121,16 @@ namespace Silmaril {
     void Application::DispatchEvents(const Event& event)
     {
         EventDispatcher dispatcher(event);
+
+        dispatcher.Dispatch<WindowClosedEvent>([&](const WindowClosedEvent& e) -> bool {
+            m_Running = false;
+            return true;
+        });
+
+        dispatcher.Dispatch<WindowMinimizeEvent>([&](const WindowMinimizeEvent& e) -> bool {
+            m_Minimized = e.minimized;
+            return false;
+        });
     }
 
 }

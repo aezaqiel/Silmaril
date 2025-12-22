@@ -2,6 +2,7 @@ add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/tinyobjloader)
 add_subdirectory(thirdparty/spdlog)
 add_subdirectory(thirdparty/glfw)
+add_subdirectory(thirdparty/glad)
 
 add_executable(Silmaril
     src/Silmaril/Main.cpp
@@ -26,6 +27,8 @@ add_executable(Silmaril
     src/Silmaril/Core/Logger.cpp
     src/Silmaril/Core/KeyCodes.hpp
     src/Silmaril/Core/Events.hpp
+    src/Silmaril/Core/Window.hpp
+    src/Silmaril/Core/Window.cpp
 
     src/Silmaril/Geometry/Shape.hpp
     src/Silmaril/Geometry/Primitive.hpp
@@ -87,12 +90,14 @@ PRIVATE
     tinyobjloader
     spdlog
     glfw
+    glad
 )
 
 target_compile_definitions(Silmaril
 PRIVATE
     NOMINMAX
     GLM_ENABLE_EXPERIMENTAL
+    GLFW_INCLUDE_NONE
 )
 
 target_precompile_headers(Silmaril

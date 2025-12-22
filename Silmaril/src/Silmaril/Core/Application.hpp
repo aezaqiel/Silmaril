@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Events.hpp"
+#include "Window.hpp"
 
 #include "Silmaril/Cameras/Film.hpp"
 #include "Silmaril/Cameras/Camera.hpp"
@@ -42,6 +43,11 @@ namespace Silmaril {
 
     private:
         Config m_Config;
+
+        bool m_Running { true };
+        bool m_Minimized { false };
+
+        std::unique_ptr<Window> m_Window;
 
         std::shared_ptr<Film> m_Film;
         std::shared_ptr<Camera> m_Camera;
