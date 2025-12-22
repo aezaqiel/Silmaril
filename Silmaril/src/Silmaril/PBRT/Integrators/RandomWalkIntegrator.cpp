@@ -12,7 +12,8 @@
 namespace Silmaril {
 
     RandomWalkIntegrator::RandomWalkIntegrator(const Config& config)
-        : Integrator(config.tile), m_Camera(config.camera), m_Sampler(config.sampler), m_MaxDepth(config.depth)
+        :   Integrator(config.tile),
+            m_Config(config)
     {
     }
 
@@ -20,8 +21,10 @@ namespace Silmaril {
     {
         m_CancelRender = false;
 
-        u32 width = m_Camera->GetFilm().GetWidth();
-        u32 height = m_Camera->GetFilm().GetHeight();
+        const auto& camera = m_Config.camera;
+
+        u32 width = camera->GetFilm().GetWidth();
+        u32 height = camera->GetFilm().GetHeight();
 
         u32 tilesX = (width + m_TileSize - 1) / m_TileSize;
         u32 tilesY = (height + m_TileSize - 1) / m_TileSize;
@@ -42,27 +45,28 @@ namespace Silmaril {
 
         LOG_INFO("Rendering {} tiles ({}x{})", totalTiles, m_TileSize, m_TileSize);
 
-        for (const Tile& tile : tiles) {
-            if (m_CancelRender) {
-                LOG_WARN("In-progress Render Cancelled");
-                return;
-            }
+        std::for_each(std::execution::par, tiles.begin(), tiles.end(), [&](const Tile& tile) {
+            if (m_CancelRender) return;
 
             RenderTile(tile, scene);
 
             if (m_RenderCallback) {
                 m_RenderCallback(tile.x, tile.y, tile.w, tile.h);
             }
+        });
+
+        if (m_CancelRender) {
+            LOG_WARN("In-progress render cancelled");
+            return;
         }
 
-        if (!m_CancelRender) {
-            m_Camera->GetFilm().Write("Output.png");
-        }
+        camera->GetFilm().Write(m_Config.output);
     }
 
     void RandomWalkIntegrator::RenderTile(const Tile& tile, const Scene& scene)
     {
-        auto sampler = m_Sampler->Clone();
+        const auto& camera = m_Config.camera;
+        auto sampler = m_Config.sampler->Clone();
 
         for (u32 y = tile.y; y < tile.y + tile.h; ++y) {
             for (u32 x = tile.x; x < tile.x + tile.w; ++x) {
@@ -73,20 +77,20 @@ namespace Silmaril {
                     CameraSample cs;
                     cs.pFilm = glm::vec2(x, y) + sampler->Get2D();
 
-                    Ray ray = m_Camera->GenerateRay(cs);
+                    Ray ray = camera->GenerateRay(cs);
 
                     accumulator += Li(ray, scene, *sampler, 0);
                 }
 
                 accumulator /= static_cast<f32>(sampler->GetSPP());
-                m_Camera->GetFilm().SetPixel(x, y, accumulator);
+                camera->GetFilm().SetPixel(x, y, accumulator);
             }
         }
     }
 
     glm::vec3 RandomWalkIntegrator::Li(const Ray& ray, const Scene& scene, Sampler& sampler, usize depth)
     {
-        if (depth >= m_MaxDepth) return glm::vec3(0.0f);
+        if (depth >= m_Config.depth) return glm::vec3(0.0f);
 
         SurfaceInteraction intersect;
         if (!scene.Intersect(ray, intersect)) {

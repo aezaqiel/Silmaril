@@ -25,6 +25,8 @@ namespace Silmaril {
             glm::vec3 lookat;
             glm::vec3 up;
             f32 fov;
+
+            std::string output;
         };
 
     public:

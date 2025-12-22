@@ -19,6 +19,8 @@ namespace Silmaril {
             std::shared_ptr<Sampler> sampler;
             u32 depth;
             u32 tile;
+
+            std::string output;
         };
     public:
         RandomWalkIntegrator(const Config& config);
@@ -40,10 +42,7 @@ namespace Silmaril {
         glm::vec3 Li(const Ray& ray, const Scene& scene, Sampler& sampler, usize depth);
 
     private:
-        std::shared_ptr<Camera> m_Camera;
-        std::shared_ptr<Sampler> m_Sampler;
-
-        u32 m_MaxDepth { 1 };
+        Config m_Config;
     };
 
 }

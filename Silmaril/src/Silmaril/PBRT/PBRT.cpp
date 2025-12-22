@@ -83,7 +83,8 @@ namespace Silmaril {
             m_Camera,
             m_Sampler,
             m_Config.depth,
-            m_Config.tile
+            m_Config.tile,
+            m_Config.output
         });
     }
 
