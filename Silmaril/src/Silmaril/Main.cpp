@@ -20,9 +20,9 @@ int main()
 {
     using namespace Silmaril;
 
-    u32 width = 1920;
-    u32 height = 1080;
-    u32 samples = 1024;
+    u32 width = 400;
+    u32 height = 300;
+    u32 samples = 64;
     u32 depth = 8;
 
     std::println("Initializing Scene...");

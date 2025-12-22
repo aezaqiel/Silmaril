@@ -7,3 +7,6 @@
 [submodule "Silmaril/thirdparty/tinyobjloader"]
 	path = Silmaril/thirdparty/tinyobjloader
 	url = https://github.com/aezaqiel/tinyobjloader.git
+[submodule "Silmaril/res/Assets/Sponza"]
+	path = Silmaril/res/Assets/Sponza
+	url = https://github.com/jimmiebergmann/Sponza.git
