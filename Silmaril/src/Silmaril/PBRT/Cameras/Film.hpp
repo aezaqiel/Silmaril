@@ -16,6 +16,8 @@ namespace Silmaril {
 
         void SetPixel(u32 x, u32 y, const glm::vec3& color);
         void AddSample(u32 x, u32 y, const glm::vec3& L);
+        void AccumulateSample(u32 x, u32 y, const glm::vec3& L, u32 sample);
+
         void Write(const std::string& filename) const;
 
     private:
@@ -23,6 +25,7 @@ namespace Silmaril {
         u32 m_Height { 0 };
 
         std::vector<glm::vec3> m_Pixels;
+        std::vector<glm::vec3> m_Accumulator;
     };
 
 }

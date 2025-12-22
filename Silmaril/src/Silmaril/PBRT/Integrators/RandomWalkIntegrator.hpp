@@ -38,7 +38,7 @@ namespace Silmaril {
         };
 
     private:
-        void RenderTile(const Tile& tile, const Scene& scene);
+        void RenderTile(const Tile& tile, const Scene& scene, u32 sample);
         glm::vec3 Li(const Ray& ray, const Scene& scene, Sampler& sampler, usize depth);
 
     private:

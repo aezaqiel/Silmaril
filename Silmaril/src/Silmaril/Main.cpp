@@ -5,9 +5,9 @@ int main()
 {
     Silmaril::Logger::Init();
 
-    constexpr u32 IMAGE_WIDTH = 800;
-    constexpr u32 IMAGE_HEIGHT = 600;
-    constexpr u32 SAMPLES = 32;
+    constexpr u32 IMAGE_WIDTH = 1920;
+    constexpr u32 IMAGE_HEIGHT = 1080;
+    constexpr u32 SAMPLES = 512;
     constexpr u32 DEPTH = 8;
 
     constexpr u32 TILE_SIZE = 16;

@@ -27,6 +27,7 @@ namespace Silmaril {
         : m_Width(width), m_Height(height)
     {
         m_Pixels.resize(width * height, glm::vec3(0.0f));
+        m_Accumulator.resize(width * height, glm::vec3(0.0f));
     }
 
     void Film::SetPixel(u32 x, u32 y, const glm::vec3& color)
@@ -39,6 +40,16 @@ namespace Silmaril {
     {
         if (x >= m_Width || y >= m_Height) return;
         m_Pixels[x + y * m_Width] += L;
+    }
+
+    void Film::AccumulateSample(u32 x, u32 y, const glm::vec3& L, u32 sample)
+    {
+        if (x >= m_Width || y >= m_Height) return;
+
+        usize index = x + y * m_Width;
+
+        m_Accumulator[index] += L;
+        m_Pixels[index] = m_Accumulator[index] / static_cast<f32>(sample);
     }
 
     void Film::Write(const std::string& filename) const

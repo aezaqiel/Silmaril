@@ -22,6 +22,7 @@ namespace Silmaril {
         m_CancelRender = false;
 
         const auto& camera = m_Config.camera;
+        const auto& sampler = m_Config.sampler;
 
         u32 width = camera->GetFilm().GetWidth();
         u32 height = camera->GetFilm().GetHeight();
@@ -43,27 +44,36 @@ namespace Silmaril {
             }
         }
 
-        LOG_INFO("Rendering {} tiles ({}x{})", totalTiles, m_TileSize, m_TileSize);
+        LOG_INFO("Rendering {} tiles ({}x{}) for {} samples", totalTiles, m_TileSize, m_TileSize, sampler->GetSPP());
 
-        std::for_each(std::execution::par, tiles.begin(), tiles.end(), [&](const Tile& tile) {
-            if (m_CancelRender) return;
+        for (u32 pass = 1; pass < sampler->GetSPP(); ++pass) {
+            auto start = std::chrono::steady_clock::now();
 
-            RenderTile(tile, scene);
+            std::for_each(std::execution::par, tiles.begin(), tiles.end(), [&](const Tile& tile) {
+                if (m_CancelRender) return;
 
-            if (m_RenderCallback) {
-                m_RenderCallback(tile.x, tile.y, tile.w, tile.h);
+                RenderTile(tile, scene, pass);
+
+                if (m_RenderCallback) {
+                    m_RenderCallback(tile.x, tile.y, tile.w, tile.h);
+                }
+            });
+
+            if (m_CancelRender) {
+                LOG_WARN("In-progress render cancelled");
+                return;
             }
-        });
 
-        if (m_CancelRender) {
-            LOG_WARN("In-progress render cancelled");
-            return;
+            auto end = std::chrono::steady_clock::now();
+            std::chrono::duration<f32> duration = end - start;
+
+            LOG_INFO("Pass [{}/{}] | {:.2f} seconds", pass, sampler->GetSPP(), duration.count());
         }
 
         camera->GetFilm().Write(m_Config.output);
     }
 
-    void RandomWalkIntegrator::RenderTile(const Tile& tile, const Scene& scene)
+    void RandomWalkIntegrator::RenderTile(const Tile& tile, const Scene& scene, u32 sample)
     {
         const auto& camera = m_Config.camera;
         auto sampler = m_Config.sampler->Clone();
@@ -72,18 +82,14 @@ namespace Silmaril {
             for (u32 x = tile.x; x < tile.x + tile.w; ++x) {
                 sampler->StartPixel(x, y);
 
-                glm::vec3 accumulator(0.0f);
-                while (sampler->StartNextSample()) {
-                    CameraSample cs;
-                    cs.pFilm = glm::vec2(x, y) + sampler->Get2D();
+                CameraSample cs;
+                cs.pFilm = glm::vec2(x, y) + sampler->Get2D();
 
-                    Ray ray = camera->GenerateRay(cs);
+                Ray ray = camera->GenerateRay(cs);
 
-                    accumulator += Li(ray, scene, *sampler, 0);
-                }
+                glm::vec3 L = Li(ray, scene, *sampler, 0);
 
-                accumulator /= static_cast<f32>(sampler->GetSPP());
-                camera->GetFilm().SetPixel(x, y, accumulator);
+                camera->GetFilm().AccumulateSample(x, y, L, sample);
             }
         }
     }
