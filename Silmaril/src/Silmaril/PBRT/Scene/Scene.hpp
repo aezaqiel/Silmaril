@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Silmaril/Geometry/Primitive.hpp"
-#include "Silmaril/Lights/Light.hpp"
-#include "Silmaril/Containers/Interaction.hpp"
-#include "Silmaril/Containers/AABB.hpp"
+#include "Silmaril/PBRT/Geometry/Primitive.hpp"
+#include "Silmaril/PBRT/Lights/Light.hpp"
+#include "Silmaril/PBRT/Containers/Interaction.hpp"
+#include "Silmaril/PBRT/Containers/AABB.hpp"
 
 namespace Silmaril {
 

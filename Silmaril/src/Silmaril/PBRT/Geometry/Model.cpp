@@ -3,7 +3,7 @@
 #include "Triangle.hpp"
 #include "GeometricPrimitive.hpp"
 
-#include "Silmaril/Materials/MatteMaterial.hpp"
+#include "Silmaril/PBRT/Materials/MatteMaterial.hpp"
 
 namespace Silmaril {
 

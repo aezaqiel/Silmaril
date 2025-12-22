@@ -1,8 +1,9 @@
 #include "GeometricPrimitive.hpp"
 
-#include "Silmaril/Geometry/Shape.hpp"
-#include "Silmaril/Materials/Material.hpp"
-#include "Silmaril/Containers/AABB.hpp"
+#include "Shape.hpp"
+
+#include "Silmaril/PBRT/Materials/Material.hpp"
+#include "Silmaril/PBRT/Containers/AABB.hpp"
 
 namespace Silmaril {
 

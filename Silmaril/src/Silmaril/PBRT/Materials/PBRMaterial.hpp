@@ -3,7 +3,7 @@
 #include "Material.hpp"
 #include "BSDF.hpp"
 
-#include "Silmaril/Textures/Texture.hpp"
+#include "Silmaril/PBRT/Textures/Texture.hpp"
 
 namespace Silmaril {
 

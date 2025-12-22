@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Silmaril/Containers/Interaction.hpp"
+#include "Silmaril/PBRT/Containers/Interaction.hpp"
 
 namespace Silmaril {
 

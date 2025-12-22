@@ -1,6 +1,6 @@
 #include "PerspectiveCamera.hpp"
 
-#include "Silmaril/Containers/Ray.hpp"
+#include "Silmaril/PBRT/Containers/Ray.hpp"
 
 namespace Silmaril {
 

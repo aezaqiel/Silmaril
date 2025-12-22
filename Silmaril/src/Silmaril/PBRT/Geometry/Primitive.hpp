@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Silmaril/Containers/Ray.hpp"
-#include "Silmaril/Containers/Interaction.hpp"
-#include "Silmaril/Containers/AABB.hpp"
+#include "Silmaril/PBRT/Containers/Ray.hpp"
+#include "Silmaril/PBRT/Containers/Interaction.hpp"
+#include "Silmaril/PBRT/Containers/AABB.hpp"
 
-#include "Silmaril/Materials/Material.hpp"
+#include "Silmaril/PBRT/Materials/Material.hpp"
 
 namespace Silmaril {
 

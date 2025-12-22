@@ -2,7 +2,7 @@
 
 #include <glm/gtc/constants.hpp>
 
-#include "Silmaril/Textures/SolidTexture.hpp"
+#include "Silmaril/PBRT/Textures/SolidTexture.hpp"
 
 namespace Silmaril {
 

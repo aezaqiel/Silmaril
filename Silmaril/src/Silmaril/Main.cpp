@@ -5,18 +5,29 @@ int main()
 {
     Silmaril::Logger::Init();
 
+    constexpr u32 IMAGE_WIDTH = 1280;
+    constexpr u32 IMAGE_HEIGHT = 720;
+    constexpr u32 SAMPLES = 32;
+    constexpr u32 DEPTH = 8;
+
     Silmaril::Application* app = new Silmaril::Application({
-        .width = 400,
-        .height = 300,
-        .samples = 16,
-        .depth = 4,
+        .width = IMAGE_WIDTH,
+        .height = IMAGE_HEIGHT,
+        .title = "Silmaril",
 
-        .model = "Assets/Sponza/sponza.obj",
+        .pbrt = {
+            .width = IMAGE_WIDTH,
+            .height = IMAGE_HEIGHT,
+            .samples = SAMPLES,
+            .depth = DEPTH,
 
-        .lookfrom = { 1100.0f, 180.0f, 0.0f },
-        .lookat = { 0.0f, 180.0f, 0.0f },
-        .up = { 0.0f, 1.0f, 0.0f },
-        .fov = 90.0f
+            .model = "Assets/Sponza/sponza.obj",
+
+            .lookfrom = { 1100.0f, 180.0f, 0.0f },
+            .lookat = { 0.0f, 180.0f, 0.0f },
+            .up = { 0.0f, 1.0f, 0.0f },
+            .fov = 90.0f
+        }
     });
 
     app->Run();

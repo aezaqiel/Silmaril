@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "Film.hpp"
-#include "Silmaril/Containers/Ray.hpp"
+#include "Silmaril/PBRT/Containers/Ray.hpp"
 
 namespace Silmaril {
 

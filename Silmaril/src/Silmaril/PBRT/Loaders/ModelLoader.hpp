@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Silmaril/Geometry/Model.hpp"
+#include "Silmaril/PBRT/Geometry/Model.hpp"
 
 namespace Silmaril {
 

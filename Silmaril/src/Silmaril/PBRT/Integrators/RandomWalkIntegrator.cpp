@@ -1,11 +1,11 @@
 #include "RandomWalkIntegrator.hpp"
 
-#include "Silmaril/Cameras/Camera.hpp"
-#include "Silmaril/Samplers/Sampler.hpp"
-#include "Silmaril/Containers/Interaction.hpp"
-#include "Silmaril/Scene/Scene.hpp"
-#include "Silmaril/Materials/Material.hpp"
-#include "Silmaril/Materials/BSDF.hpp"
+#include "Silmaril/PBRT/Cameras/Camera.hpp"
+#include "Silmaril/PBRT/Samplers/Sampler.hpp"
+#include "Silmaril/PBRT/Containers/Interaction.hpp"
+#include "Silmaril/PBRT/Scene/Scene.hpp"
+#include "Silmaril/PBRT/Materials/Material.hpp"
+#include "Silmaril/PBRT/Materials/BSDF.hpp"
 
 #include "Silmaril/Core/Logger.hpp"
 

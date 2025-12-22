@@ -8,19 +8,6 @@ add_executable(Silmaril
     src/Silmaril/Main.cpp
     src/Silmaril/Types.hpp
 
-    src/Silmaril/Cameras/Camera.hpp
-    src/Silmaril/Cameras/Camera.cpp
-    src/Silmaril/Cameras/Film.hpp
-    src/Silmaril/Cameras/Film.cpp
-    src/Silmaril/Cameras/PerspectiveCamera.hpp
-    src/Silmaril/Cameras/PerspectiveCamera.cpp
-
-    src/Silmaril/Containers/Ray.hpp
-    src/Silmaril/Containers/Bounds.hpp
-    src/Silmaril/Containers/AABB.hpp
-    src/Silmaril/Containers/AABB.cpp
-    src/Silmaril/Containers/Interaction.hpp
-
     src/Silmaril/Core/Application.hpp
     src/Silmaril/Core/Application.cpp
     src/Silmaril/Core/Logger.hpp
@@ -30,49 +17,65 @@ add_executable(Silmaril
     src/Silmaril/Core/Window.hpp
     src/Silmaril/Core/Window.cpp
 
-    src/Silmaril/Geometry/Shape.hpp
-    src/Silmaril/Geometry/Primitive.hpp
-    src/Silmaril/Geometry/GeometricPrimitive.hpp
-    src/Silmaril/Geometry/GeometricPrimitive.cpp
-    src/Silmaril/Geometry/Sphere.hpp
-    src/Silmaril/Geometry/Sphere.cpp
-    src/Silmaril/Geometry/Triangle.hpp
-    src/Silmaril/Geometry/Triangle.cpp
-    src/Silmaril/Geometry/Mesh.hpp
-    src/Silmaril/Geometry/Model.hpp
-    src/Silmaril/Geometry/Model.cpp
-    src/Silmaril/Geometry/BVH.hpp
-    src/Silmaril/Geometry/BVH.cpp
+    src/Silmaril/PBRT/Cameras/Camera.hpp
+    src/Silmaril/PBRT/Cameras/Camera.cpp
+    src/Silmaril/PBRT/Cameras/Film.hpp
+    src/Silmaril/PBRT/Cameras/Film.cpp
+    src/Silmaril/PBRT/Cameras/PerspectiveCamera.hpp
+    src/Silmaril/PBRT/Cameras/PerspectiveCamera.cpp
 
-    src/Silmaril/Integrators/Integrator.hpp
-    src/Silmaril/Integrators/RandomWalkIntegrator.hpp
-    src/Silmaril/Integrators/RandomWalkIntegrator.cpp
+    src/Silmaril/PBRT/Containers/Ray.hpp
+    src/Silmaril/PBRT/Containers/Bounds.hpp
+    src/Silmaril/PBRT/Containers/AABB.hpp
+    src/Silmaril/PBRT/Containers/AABB.cpp
+    src/Silmaril/PBRT/Containers/Interaction.hpp
 
-    src/Silmaril/Lights/Light.hpp
-    src/Silmaril/Lights/PointLight.hpp
-    src/Silmaril/Lights/PointLight.cpp
+    src/Silmaril/PBRT/Geometry/Shape.hpp
+    src/Silmaril/PBRT/Geometry/Primitive.hpp
+    src/Silmaril/PBRT/Geometry/GeometricPrimitive.hpp
+    src/Silmaril/PBRT/Geometry/GeometricPrimitive.cpp
+    src/Silmaril/PBRT/Geometry/Sphere.hpp
+    src/Silmaril/PBRT/Geometry/Sphere.cpp
+    src/Silmaril/PBRT/Geometry/Triangle.hpp
+    src/Silmaril/PBRT/Geometry/Triangle.cpp
+    src/Silmaril/PBRT/Geometry/Mesh.hpp
+    src/Silmaril/PBRT/Geometry/Model.hpp
+    src/Silmaril/PBRT/Geometry/Model.cpp
+    src/Silmaril/PBRT/Geometry/BVH.hpp
+    src/Silmaril/PBRT/Geometry/BVH.cpp
 
-    src/Silmaril/Loaders/ModelLoader.hpp
-    src/Silmaril/Loaders/ModelLoader.cpp
+    src/Silmaril/PBRT/Integrators/Integrator.hpp
+    src/Silmaril/PBRT/Integrators/RandomWalkIntegrator.hpp
+    src/Silmaril/PBRT/Integrators/RandomWalkIntegrator.cpp
 
-    src/Silmaril/Materials/BSDF.hpp
-    src/Silmaril/Materials/Material.hpp
-    src/Silmaril/Materials/MatteMaterial.hpp
-    src/Silmaril/Materials/MatteMaterial.cpp
-    src/Silmaril/Materials/PBRMaterial.hpp
-    src/Silmaril/Materials/PBRMaterial.cpp
+    src/Silmaril/PBRT/Lights/Light.hpp
+    src/Silmaril/PBRT/Lights/PointLight.hpp
+    src/Silmaril/PBRT/Lights/PointLight.cpp
 
-    src/Silmaril/Samplers/Sampler.hpp
-    src/Silmaril/Samplers/Sampler.cpp
-    src/Silmaril/Samplers/RandomSampler.hpp
-    src/Silmaril/Samplers/RandomSampler.cpp
+    src/Silmaril/PBRT/Loaders/ModelLoader.hpp
+    src/Silmaril/PBRT/Loaders/ModelLoader.cpp
 
-    src/Silmaril/Scene/Scene.hpp
+    src/Silmaril/PBRT/Materials/BSDF.hpp
+    src/Silmaril/PBRT/Materials/Material.hpp
+    src/Silmaril/PBRT/Materials/MatteMaterial.hpp
+    src/Silmaril/PBRT/Materials/MatteMaterial.cpp
+    src/Silmaril/PBRT/Materials/PBRMaterial.hpp
+    src/Silmaril/PBRT/Materials/PBRMaterial.cpp
 
-    src/Silmaril/Textures/Texture.hpp
-    src/Silmaril/Textures/SolidTexture.hpp
-    src/Silmaril/Textures/ImageTexture.hpp
-    src/Silmaril/Textures/ImageTexture.cpp
+    src/Silmaril/PBRT/Samplers/Sampler.hpp
+    src/Silmaril/PBRT/Samplers/Sampler.cpp
+    src/Silmaril/PBRT/Samplers/RandomSampler.hpp
+    src/Silmaril/PBRT/Samplers/RandomSampler.cpp
+
+    src/Silmaril/PBRT/Scene/Scene.hpp
+
+    src/Silmaril/PBRT/Textures/Texture.hpp
+    src/Silmaril/PBRT/Textures/SolidTexture.hpp
+    src/Silmaril/PBRT/Textures/ImageTexture.hpp
+    src/Silmaril/PBRT/Textures/ImageTexture.cpp
+
+    src/Silmaril/PBRT/PBRT.hpp
+    src/Silmaril/PBRT/PBRT.cpp
 
     src/Platform/STBImpl.cpp
 )

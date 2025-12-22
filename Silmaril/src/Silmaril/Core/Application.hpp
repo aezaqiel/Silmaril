@@ -3,11 +3,7 @@
 #include "Events.hpp"
 #include "Window.hpp"
 
-#include "Silmaril/Cameras/Film.hpp"
-#include "Silmaril/Cameras/Camera.hpp"
-#include "Silmaril/Samplers/Sampler.hpp"
-#include "Silmaril/Integrators/Integrator.hpp"
-#include "Silmaril/Scene/Scene.hpp"
+#include "Silmaril/PBRT/PBRT.hpp"
 
 namespace Silmaril {
 
@@ -18,15 +14,9 @@ namespace Silmaril {
         {
             u32 width;
             u32 height;
-            u32 samples;
-            u32 depth;
+            std::string title;
 
-            std::string model;
-
-            glm::vec3 lookfrom;
-            glm::vec3 lookat;
-            glm::vec3 up;
-            f32 fov;
+            PBRT::Config pbrt;
         };
 
     public:
@@ -36,9 +26,6 @@ namespace Silmaril {
         void Run();
 
     private:
-        void InitializeIntegrator();
-        void InitializeScene();
-
         void DispatchEvents(const Event& event);
 
     private:
@@ -49,14 +36,8 @@ namespace Silmaril {
 
         std::unique_ptr<Window> m_Window;
 
-        std::shared_ptr<Film> m_Film;
-        std::shared_ptr<Camera> m_Camera;
-        std::shared_ptr<Sampler> m_Sampler;
-        std::unique_ptr<Integrator> m_Integrator;
-
-        std::vector<std::shared_ptr<Primitive>> m_Primitives;
-        std::vector<std::shared_ptr<Light>> m_Lights;
-        std::unique_ptr<Scene> m_Scene;
+        std::unique_ptr<PBRT> m_PBRT;
+        std::jthread m_PBRTThread;
     };
 
 }

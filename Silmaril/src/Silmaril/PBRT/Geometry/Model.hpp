@@ -3,7 +3,7 @@
 #include "Primitive.hpp"
 #include "Mesh.hpp"
 
-#include "Silmaril/Materials/Material.hpp"
+#include "Silmaril/PBRT/Materials/Material.hpp"
 
 namespace Silmaril {
 

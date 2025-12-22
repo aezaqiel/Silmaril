@@ -2,13 +2,13 @@
 
 #include <tiny_obj_loader.h>
 
-#include "Silmaril/Geometry/Mesh.hpp"
+#include "Silmaril/PBRT/Geometry/Mesh.hpp"
 
-#include "Silmaril/Textures/Texture.hpp"
-#include "Silmaril/Textures/SolidTexture.hpp"
-#include "Silmaril/Textures/ImageTexture.hpp"
+#include "Silmaril/PBRT/Textures/Texture.hpp"
+#include "Silmaril/PBRT/Textures/SolidTexture.hpp"
+#include "Silmaril/PBRT/Textures/ImageTexture.hpp"
 
-#include "Silmaril/Materials/PBRMaterial.hpp"
+#include "Silmaril/PBRT/Materials/PBRMaterial.hpp"
 
 #include "Silmaril/Core/Logger.hpp"
 

@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 
 #include "Ray.hpp"
-#include "Silmaril/Materials/BSDF.hpp"
+#include "Silmaril/PBRT/Materials/BSDF.hpp"
 
 namespace Silmaril {
 
