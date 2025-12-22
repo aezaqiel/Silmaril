@@ -13,3 +13,6 @@
 [submodule "Silmaril/thirdparty/spdlog"]
 	path = Silmaril/thirdparty/spdlog
 	url = https://github.com/aezaqiel/spdlog
+[submodule "Silmaril/thirdparty/glfw"]
+	path = Silmaril/thirdparty/glfw
+	url = https://github.com/glfw/glfw

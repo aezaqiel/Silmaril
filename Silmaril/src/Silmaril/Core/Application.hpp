@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Events.hpp"
+
 #include "Silmaril/Cameras/Film.hpp"
 #include "Silmaril/Cameras/Camera.hpp"
 #include "Silmaril/Samplers/Sampler.hpp"
@@ -35,6 +37,8 @@ namespace Silmaril {
     private:
         void InitializeIntegrator();
         void InitializeScene();
+
+        void DispatchEvents(const Event& event);
 
     private:
         Config m_Config;

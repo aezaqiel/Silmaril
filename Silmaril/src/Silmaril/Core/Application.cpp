@@ -104,4 +104,9 @@ namespace Silmaril {
         m_Scene = std::make_unique<Scene>(bvh, lights);
     }
 
+    void Application::DispatchEvents(const Event& event)
+    {
+        EventDispatcher dispatcher(event);
+    }
+
 }

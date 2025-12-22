@@ -1,6 +1,7 @@
 add_subdirectory(thirdparty/glm)
 add_subdirectory(thirdparty/tinyobjloader)
 add_subdirectory(thirdparty/spdlog)
+add_subdirectory(thirdparty/glfw)
 
 add_executable(Silmaril
     src/Silmaril/Main.cpp
@@ -23,6 +24,8 @@ add_executable(Silmaril
     src/Silmaril/Core/Application.cpp
     src/Silmaril/Core/Logger.hpp
     src/Silmaril/Core/Logger.cpp
+    src/Silmaril/Core/KeyCodes.hpp
+    src/Silmaril/Core/Events.hpp
 
     src/Silmaril/Geometry/Shape.hpp
     src/Silmaril/Geometry/Primitive.hpp
@@ -83,6 +86,7 @@ PRIVATE
     glm
     tinyobjloader
     spdlog
+    glfw
 )
 
 target_compile_definitions(Silmaril
@@ -95,6 +99,13 @@ target_precompile_headers(Silmaril
 PRIVATE
     src/Silmaril/PCH.hpp
 )
+
+if (WIN32)
+    target_compile_definitions(Silmaril
+    PRIVATE
+        GLFW_EXPOSE_NATIVE_WIN32
+    )
+endif()
 
 file(TO_CMAKE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/render OUTPUT_FOLDER)
 file(TO_CMAKE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/res RES_FOLDER)
