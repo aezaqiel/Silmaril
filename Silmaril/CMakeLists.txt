@@ -18,6 +18,9 @@ add_executable(Silmaril
     src/Silmaril/Containers/AABB.cpp
     src/Silmaril/Containers/Interaction.hpp
 
+    src/Silmaril/Core/Application.hpp
+    src/Silmaril/Core/Application.cpp
+
     src/Silmaril/Geometry/Shape.hpp
     src/Silmaril/Geometry/Primitive.hpp
     src/Silmaril/Geometry/GeometricPrimitive.hpp

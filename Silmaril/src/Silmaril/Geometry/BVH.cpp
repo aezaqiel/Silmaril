@@ -4,6 +4,13 @@ namespace Silmaril {
 
     namespace {
 
+        struct BVHBuildStats
+        {
+            usize nodes { 0 };
+            usize leaves { 0 };
+            usize depth { 0 };
+        };
+
         glm::vec3 GetCentroid(const AABB& bbox)
         {
             return glm::vec3(
@@ -11,6 +18,52 @@ namespace Silmaril {
                 (bbox.y.min + bbox.y.max) * 0.5f,
                 (bbox.z.min + bbox.z.max) * 0.5f
             );
+        }
+
+        std::shared_ptr<Primitive> BuildBVH(std::vector<std::shared_ptr<Primitive>> primitives, usize depth, BVHBuildStats& stats)
+        {
+            stats.depth = std::max(stats.depth, depth);
+
+            if (primitives.empty()) return nullptr;
+            if (primitives.size() == 1) {
+                stats.leaves += 1;
+                return primitives[0];
+            }
+
+            stats.nodes += 1;
+
+            AABB centroidBounds;
+            for (const auto& p : primitives) {
+                glm::vec3 c = GetCentroid(p->GetBound());
+                centroidBounds = AABB(centroidBounds, AABB(c, c));
+            }
+
+            i32 axis = 0;
+            f32 maxExtent = centroidBounds.x.Size();
+            if (centroidBounds.y.Size() > maxExtent) {
+                axis = 1;
+                maxExtent = centroidBounds.y.Size();
+            }
+            if (centroidBounds.z.Size() > maxExtent) {
+                axis = 2;
+            }
+
+            usize mid = primitives.size() / 2;
+            std::nth_element(primitives.begin(), primitives.begin() + mid, primitives.end(),
+                [&](const auto& a, const auto& b) -> bool {
+                    glm::vec3 ca = GetCentroid(a->GetBound());
+                    glm::vec3 cb = GetCentroid(b->GetBound());
+                    return ca[axis] < cb[axis];
+                }
+            );
+
+            std::vector<std::shared_ptr<Primitive>> leftPrims(primitives.begin(), primitives.begin() + mid);
+            std::vector<std::shared_ptr<Primitive>> rightPrims(primitives.begin() + mid, primitives.end());
+
+            auto left = BuildBVH(leftPrims, depth + 1, stats);
+            auto right = BuildBVH(rightPrims, depth + 1, stats);
+
+            return std::make_shared<BVH>(left, right);
         }
     
     }
@@ -67,38 +120,17 @@ namespace Silmaril {
 
     std::shared_ptr<Primitive> BVH::Create(std::vector<std::shared_ptr<Primitive>> primitives)
     {
-        if (primitives.empty()) return nullptr;
-        if (primitives.size() == 1) return primitives[0];
+        BVHBuildStats stats;
 
-        AABB centroidBounds;
-        for (const auto& p : primitives) {
-            glm::vec3 c = GetCentroid(p->GetBound());
-            centroidBounds = AABB(centroidBounds, AABB(c, c));
-        }
+        auto root = BuildBVH(primitives, 0, stats);
 
-        i32 axis = 0;
-        f32 maxExtent = centroidBounds.x.Size();
-        if (centroidBounds.y.Size() > maxExtent) {
-            axis = 1;
-            maxExtent = centroidBounds.y.Size();
-        }
-        if (centroidBounds.z.Size() > maxExtent) {
-            axis = 2;
-        }
+        std::println("BVH Construction Metrics");
+        std::println(" - Total Primitives: {}", primitives.size());
+        std::println(" - Internal Nodes: {}", stats.nodes);
+        std::println(" - Leaf Nodes: {}", stats.leaves);
+        std::println(" - Max Tree Depth: {}", stats.depth);
 
-        usize mid = primitives.size() / 2;
-        std::nth_element(primitives.begin(), primitives.begin() + mid, primitives.end(),
-            [&](const auto& a, const auto& b) -> bool {
-                glm::vec3 ca = GetCentroid(a->GetBound());
-                glm::vec3 cb = GetCentroid(b->GetBound());
-                return ca[axis] < cb[axis];
-            }
-        );
-
-        std::vector<std::shared_ptr<Primitive>> lPrims(primitives.begin(), primitives.begin() + mid);
-        std::vector<std::shared_ptr<Primitive>> rPrims(primitives.begin() + mid, primitives.end());
-
-        return std::make_shared<BVH>(Create(lPrims), Create(rPrims));
+        return root;
     }
 
 }
