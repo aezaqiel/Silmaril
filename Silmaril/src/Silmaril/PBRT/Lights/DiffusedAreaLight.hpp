@@ -12,6 +12,10 @@ namespace Silmaril {
         virtual ~DiffuseAreaLight() = default;
 
         virtual std::optional<LightSample> SampleLi(const Interaction& ref, const glm::vec2& u) const override;
+
+        virtual f32 PdfLi(const Interaction& ref, const glm::vec3& wi) const override;
+        virtual f32 PdfLi(const Interaction& ref, const Interaction& lightHit) const override;
+
         virtual glm::vec3 L(const Interaction& interaction, const glm::vec3& w) const override;
 
     private:

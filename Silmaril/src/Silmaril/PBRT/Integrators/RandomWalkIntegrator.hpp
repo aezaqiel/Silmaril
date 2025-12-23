@@ -39,7 +39,15 @@ namespace Silmaril {
 
     private:
         void RenderTile(const Tile& tile, const Scene& scene, u32 sample);
-        glm::vec3 Li(const Ray& ray, const Scene& scene, Sampler& sampler, u32 depth, glm::vec3 beta = glm::vec3(1.0f));
+        glm::vec3 Li(
+            const Ray& ray,
+            const Scene& scene,
+            Sampler& sampler,
+            u32 depth,
+            glm::vec3 beta = glm::vec3(1.0f),
+            f32 prevPdfBSDF = 0.0f,
+            bool prevIsDelta = false
+        );
 
     private:
         Config m_Config;

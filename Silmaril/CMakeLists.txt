@@ -57,8 +57,6 @@ add_executable(Silmaril
     src/Silmaril/PBRT/Lights/Light.hpp
     src/Silmaril/PBRT/Lights/DiffusedAreaLight.hpp
     src/Silmaril/PBRT/Lights/DiffusedAreaLight.cpp
-    src/Silmaril/PBRT/Lights/PointLight.hpp
-    src/Silmaril/PBRT/Lights/PointLight.cpp
 
     src/Silmaril/PBRT/Loaders/ModelLoader.hpp
     src/Silmaril/PBRT/Loaders/ModelLoader.cpp

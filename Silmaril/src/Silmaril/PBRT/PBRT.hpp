@@ -35,13 +35,11 @@ namespace Silmaril {
 
         inline const std::shared_ptr<Film>& GetFilm() const { return m_Film; }
 
+        void LoadScene();
         void Render();
+
         void SetTileRenderCallback(Integrator::OnRenderCallback callback);
         void RequestStop();
-
-    private:
-        void InitializeIntegrator();
-        void InitializeScene();
 
     private:
         Config m_Config;

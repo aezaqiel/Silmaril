@@ -27,6 +27,7 @@ namespace Silmaril {
     {
         m_PBRTThread = std::jthread([&] {
             LOG_INFO("Render thread spawned");
+            m_PBRT->LoadScene();
             m_PBRT->Render();
         });
 

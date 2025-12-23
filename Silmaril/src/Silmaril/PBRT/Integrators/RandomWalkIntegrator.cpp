@@ -12,6 +12,17 @@
 
 namespace Silmaril {
 
+    namespace {
+
+        f32 PowerHeuristic(f32 f, f32 g)
+        {
+            f32 f2 = f * f;
+            f32 g2 = g * g;
+            return f2 / (f2 + g2);
+        }
+    
+    }
+
     RandomWalkIntegrator::RandomWalkIntegrator(const Config& config)
         :   Integrator(config.tile),
             m_Config(config)
@@ -91,30 +102,53 @@ namespace Silmaril {
 
                 Ray ray = camera->GenerateRay(cs);
 
-                glm::vec3 L = Li(ray, scene, *sampler, 0, glm::vec3(1.0f));
+                glm::vec3 L = Li(ray, scene, *sampler, 0);
 
                 camera->GetFilm().AccumulateSample(x, y, L, sample);
             }
         }
     }
 
-    glm::vec3 RandomWalkIntegrator::Li(const Ray& ray, const Scene& scene, Sampler& sampler, u32 depth, glm::vec3 beta)
+    glm::vec3 RandomWalkIntegrator::Li(
+        const Ray& ray,
+        const Scene& scene,
+        Sampler& sampler,
+        u32 depth,
+        glm::vec3 beta,
+        f32 prevPdfBSDF,
+        bool prevIsDelta
+    )
     {
         if (depth >= m_Config.depth) return glm::vec3(0.0f);
 
+        Ray r = ray;
+        glm::vec3 L(0.0f);
+
         SurfaceInteraction intersect;
-        if (!scene.Intersect(ray, intersect)) {
+        if (!scene.Intersect(r, intersect)) {
             // Skybox
-            f32 t = 0.5f * (glm::normalize(ray.direction).y + 1.0f);
-            return glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), t);
+            f32 t = 0.5f * (glm::normalize(r.direction).y + 1.0f);
+            glm::vec3 sky = glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), t);
+
+            return beta * sky;
         }
 
-        glm::vec3 L(0.0f);
-        glm::vec3 wo = -ray.direction;
+        glm::vec3 wo = -r.direction;
 
         if (intersect.primitive->GetLight()) {
-            if (depth == 0) {
-                L += intersect.primitive->GetLight()->L(intersect, wo);
+            const Light* light = intersect.primitive->GetLight();
+            glm::vec3 Le = light->L(intersect, wo);
+
+            if (depth == 0 || prevIsDelta) {
+                L += beta * Le;
+            } else {
+                Interaction prev;
+                prev.p = r.origin;
+
+                f32 lightPdf = light->PdfLi(prev, intersect);
+                f32 weight = PowerHeuristic(prevPdfBSDF, lightPdf);
+
+                L += beta * Le * weight;
             }
         }
 
@@ -125,45 +159,58 @@ namespace Silmaril {
         if (!intersect.bsdf) return L;
 
         // Direct Light
-        for (const auto& light : scene.GetLights()) {
+        const auto& lights = scene.GetLights();
+        if (!lights.empty()) {
+            u32 lightIdx = std::min(static_cast<u32>(sampler.Get1D() * lights.size()), static_cast<u32>(lights.size()) - 1);
+            const auto& light = lights[lightIdx];
+
+            f32 lightSelectPdf = 1.0f / lights.size();
+
             auto ls = light->SampleLi(intersect, sampler.Get2D());
 
-            if (ls && ls->pdf > 0 && ls->distance > 0) {
-                Ray shadowRay = intersect.SpawnRay(ls->wi);
+            if (ls && ls->pdf > 0.0f && ls->distance > 0.0f && !glm::isinf(ls->pdf)) {
+                glm::vec3 wi = ls->wi;
+                f32 lightPdf = ls->pdf / lightSelectPdf;
+
+                Ray shadowRay = intersect.SpawnRay(wi);
                 SurfaceInteraction shadowIntersect;
                 bool hit = scene.Intersect(shadowRay, shadowIntersect);
 
-                if (!hit || shadowIntersect.t > ls->distance - 0.0001f) {
-                    glm::vec3 f = intersect.bsdf->f(wo, ls->wi);
-                    if (glm::length(f) > 0) {
-                        L += f * ls->li * glm::abs(glm::dot(intersect.shading.n, ls->wi)) / ls->pdf;
+                if (!hit || shadowIntersect.t > ls->distance - 0.001f) {
+                    glm::vec3 f = intersect.bsdf->f(wo, wi);
+                    if (glm::length(f) > 0.0f) {
+                        f32 bsdfPdf = intersect.bsdf->Pdf(wo, wi);
+                        f32 weight = light->IsDelta() ? 1.0f : PowerHeuristic(lightPdf, bsdfPdf);
+
+                        L += beta * f * ls->li * glm::abs(glm::dot(intersect.shading.n, wi)) * weight / lightPdf;
                     }
                 }
             }
         }
 
-        // Indirect Lighting
+        // BSDF Sampling
         auto bs = intersect.bsdf->SampleF(wo, sampler.Get2D());
         if (bs && bs->pdf > 0) {
-            glm::vec3 f = bs->f * glm::abs(glm::dot(intersect.shading.n, bs->wi)) / bs->pdf;
-            glm::vec3 nextBeta = beta * f;
-            f32 pSurvival = 1.0f;
+            glm::vec3 f = bs->f * glm::abs(glm::dot(intersect.shading.n, bs->wi));
+            if (glm::length(f) == 0.0f) return L;
 
+            glm::vec3 nextBeta = beta * f / bs->pdf;
+
+            f32 pSurvival = 1.0f;
             if (depth > 3) {
                 f32 maxBeta = std::max({ nextBeta.r, nextBeta.g, nextBeta.b });
                 f32 q = std::max(0.05f, 1.0f - maxBeta);
 
-                if (sampler.Get1D() < q) {
-                    return L;
-                }
+                if (sampler.Get1D() < q) return L;
 
                 pSurvival = 1.0f - q;
+                nextBeta /= pSurvival;
             }
 
             Ray nextRay = intersect.SpawnRay(bs->wi);
-            glm::vec3 indirect = Li(nextRay, scene, sampler, depth + 1, nextBeta / pSurvival);
+            bool isSpecular = (bs->pdf > 1e5f);
 
-            L += (f / pSurvival) * indirect;
+            L += Li(nextRay, scene, sampler, depth + 1, nextBeta, bs->pdf, isSpecular);
         }
 
         return L;
