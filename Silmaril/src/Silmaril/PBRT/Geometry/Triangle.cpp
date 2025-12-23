@@ -21,6 +21,19 @@ namespace Silmaril {
         return bbox;
     }
 
+    f32 Triangle::Area() const
+    {
+        const u32 idx0 = m_Mesh->indices[m_Index + 0];
+        const u32 idx1 = m_Mesh->indices[m_Index + 1];
+        const u32 idx2 = m_Mesh->indices[m_Index + 2];
+
+        const glm::vec3& p0 = m_Mesh->p[idx0];
+        const glm::vec3& p1 = m_Mesh->p[idx1];
+        const glm::vec3& p2 = m_Mesh->p[idx2];
+
+        return 0.5f * glm::length(glm::cross(p1 - p0, p2 - p0));
+    }
+
     bool Triangle::Intersect(const Ray& ray, f32& tHit, f32 tMax) const
     {
         const u32 idx0 = m_Mesh->indices[m_Index + 0];
@@ -158,6 +171,38 @@ namespace Silmaril {
             intersection.SetShadingGeometry(dpdu, dpdv, shadingDndu, shadingDndv, false);
             intersection.shading.n = shadingNormal;
         }
+    }
+
+    Interaction Triangle::Sample(const glm::vec2& u, f32& pdf) const
+    {
+        f32 su0 = glm::sqrt(u[0]);
+        f32 b0 = 1.0f - su0;
+        f32 b1 = u[1] * su0;
+        f32 b2 = 1.0f - b0 - b1;
+
+        const u32 idx0 = m_Mesh->indices[m_Index + 0];
+        const u32 idx1 = m_Mesh->indices[m_Index + 1];
+        const u32 idx2 = m_Mesh->indices[m_Index + 2];
+
+        const glm::vec3& p0 = m_Mesh->p[idx0];
+        const glm::vec3& p1 = m_Mesh->p[idx1];
+        const glm::vec3& p2 = m_Mesh->p[idx2];
+
+        glm::vec3 p = b0 * p0 + b1 * p1 + b2 * p2;
+
+        glm::vec3 n;
+        if (!m_Mesh->n.empty()) {
+            n = glm::normalize(b0 * m_Mesh->n[idx0] + b1 * m_Mesh->n[idx1] + b2 * m_Mesh->n[idx2]);
+        } else {
+            n = glm::normalize(glm::cross(p1 - p0, p2 - p0));
+        }
+
+        glm::vec3 pAbsSum = glm::abs(b0 * p0) + glm::abs(b1 * p1) + glm::abs(b2 * p2);
+        glm::vec3 pError = std::numeric_limits<f32>::epsilon() * 5.0f * pAbsSum;
+
+        pdf = 1.0f / Area();
+
+        return Interaction(p, n, pError, glm::vec3(0.0f), 0.0f);
     }
 
     std::vector<std::shared_ptr<Shape>> Triangle::CreateTriangleMesh(const std::shared_ptr<Mesh>& mesh)

@@ -25,6 +25,7 @@ namespace Silmaril {
 
         inline virtual AABB GetBound() const override { return m_Nodes.empty() ? AABB() : m_Nodes[0].bounds; }
         inline virtual const Material* GetMaterial() const override { return nullptr; }
+        inline virtual const Light* GetLight() const override { return nullptr; }
 
         virtual bool Intersect(const Ray& ray, HitInteraction& hit) const override;
         virtual void FillSurfaceInteraction(const Ray& ray, const HitInteraction& hit, SurfaceInteraction& intersection) const override;

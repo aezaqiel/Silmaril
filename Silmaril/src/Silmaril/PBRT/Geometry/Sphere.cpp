@@ -14,6 +14,11 @@ namespace Silmaril {
         return AABB(m_Center - glm::vec3(m_Radius), m_Center + glm::vec3(m_Radius));
     }
 
+    f32 Sphere::Area() const
+    {
+        return 4.0f * glm::pi<f32>() * m_Radius * m_Radius;
+    }
+
     bool Sphere::Intersect(const Ray& ray, f32& tHit, f32 tMax) const
     {
         glm::vec3 oc = ray.origin - m_Center;
@@ -76,6 +81,28 @@ namespace Silmaril {
 
         intersection = SurfaceInteraction(p, pError, uv, -ray.direction, dpdu, dpdv, dndu, dndv, ray.time, this);
         intersection.t = tHit;
+    }
+
+    Interaction Sphere::Sample(const glm::vec2& u, f32& pdf) const
+    {
+        f32 z = 1.0f - 2.0f * u[0];
+        f32 r = glm::sqrt(std::max(0.0f, 1.0f - z * z));
+        f32 phi = 2.0f * glm::pi<f32>() * u[1];
+
+        glm::vec3 d = glm::vec3(r * glm::cos(phi), r * glm::sin(phi), z);
+        glm::vec3 p = m_Center + m_Radius * d;
+        glm::vec3 n = d;
+
+        pdf = 1.0f / Area();
+
+        glm::vec3 pError = glm::abs(p) * std::numeric_limits<f32>::max() * 5.0f;
+        return Interaction(p, n, pError, glm::vec3(0.0f), 0.0);
+    }
+
+    Interaction Sphere::Sample(const Interaction& ref, const glm::vec2& u, f32& pdf) const
+    {
+        // TODO: Uniform cone sampling
+        return Sample(u, pdf);
     }
 
 }

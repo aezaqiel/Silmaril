@@ -12,6 +12,7 @@ namespace Silmaril {
         virtual ~Shape() = default;
 
         virtual AABB GetBound() const = 0;
+        virtual f32 Area() const = 0;
 
         virtual bool Intersect(const Ray& ray, f32& tHit, f32 tMax) const = 0;
         virtual void FillSurfaceInteraction(const Ray& ray, f32 tHit, SurfaceInteraction& intersection) const = 0;
@@ -22,7 +23,16 @@ namespace Silmaril {
             return Intersect(ray, t, std::numeric_limits<f32>::max());;
         }
 
-    private:
+        virtual Interaction Sample(const glm::vec2& u, f32& pdf) const = 0;
+        virtual Interaction Sample(const Interaction& ref, const glm::vec2& u, f32& pdf) const
+        {
+            return Sample(u, pdf);
+        }
+
+        virtual f32 Pdf(const Interaction& ref, const glm::vec3& wi) const
+        {
+            return 1.0f / Area();
+        }
     };
 
 }

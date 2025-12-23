@@ -20,6 +20,11 @@ namespace Silmaril {
         virtual ~Light() = default;
 
         virtual std::optional<LightSample> SampleLi(const Interaction& ref, const glm::vec2& u) const = 0;
+
+        virtual glm::vec3 L(const Interaction& interaction, const glm::vec3& w) const
+        {
+            return glm::vec3(0.0f);
+        }
     };
 
 }

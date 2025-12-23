@@ -109,14 +109,20 @@ namespace Silmaril {
             return glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), t);
         }
 
-        const Material* material = intersect.primitive->GetMaterial();
-        if (!material) return glm::vec3(0.0f);
-
-        material->ComputeScatterFn(intersect);
-        if (!intersect.bsdf) return glm::vec3(0.0f);
-
         glm::vec3 L(0.0f);
         glm::vec3 wo = -ray.direction;
+
+        if (intersect.primitive->GetLight()) {
+            if (depth == 0) {
+                L += intersect.primitive->GetLight()->L(intersect, wo);
+            }
+        }
+
+        const Material* material = intersect.primitive->GetMaterial();
+        if (!material) return L;
+
+        material->ComputeScatterFn(intersect);
+        if (!intersect.bsdf) return L;
 
         // Direct Light
         for (const auto& light : scene.GetLights()) {

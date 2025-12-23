@@ -7,8 +7,8 @@
 
 namespace Silmaril {
 
-    GeometricPrimitive::GeometricPrimitive(const std::shared_ptr<Shape>& shape, const std::shared_ptr<Material>& material)
-        : m_Shape(shape), m_Material(material)
+    GeometricPrimitive::GeometricPrimitive(const std::shared_ptr<Shape>& shape, const std::shared_ptr<Material>& material, const std::shared_ptr<Light>& light)
+        : m_Shape(shape), m_Material(material), m_Light(light)
     {
     }
 

@@ -7,8 +7,8 @@ int main()
     Silmaril::Logger::Init();
     Silmaril::JobSystem::Init(4);
 
-    constexpr u32 IMAGE_WIDTH = 400;
-    constexpr u32 IMAGE_HEIGHT = 300;
+    constexpr u32 IMAGE_WIDTH = 800;
+    constexpr u32 IMAGE_HEIGHT = 600;
     constexpr u32 SAMPLES = 32;
     constexpr u32 DEPTH = 8;
 

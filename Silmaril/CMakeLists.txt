@@ -55,6 +55,8 @@ add_executable(Silmaril
     src/Silmaril/PBRT/Integrators/RandomWalkIntegrator.cpp
 
     src/Silmaril/PBRT/Lights/Light.hpp
+    src/Silmaril/PBRT/Lights/DiffusedAreaLight.hpp
+    src/Silmaril/PBRT/Lights/DiffusedAreaLight.cpp
     src/Silmaril/PBRT/Lights/PointLight.hpp
     src/Silmaril/PBRT/Lights/PointLight.cpp
 

@@ -13,7 +13,7 @@
 #include "Geometry/Sphere.hpp"
 #include "Geometry/BVH.hpp"
 #include "Materials/MatteMaterial.hpp"
-#include "Lights/PointLight.hpp"
+#include "Lights/DiffusedAreaLight.hpp"
 
 namespace Silmaril {
 
@@ -113,9 +113,20 @@ namespace Silmaril {
         std::chrono::duration<f64> timeBVH = BVHEnd - BVHStart;
         LOG_INFO("BVH built in {:.4f} seconds", timeBVH.count());
 
-        m_Lights.push_back(std::make_shared<PointLight>(glm::vec3(0.0f, 800.0f, 0.0f), glm::vec3(500000.0f)));
-        m_Lights.push_back(std::make_shared<PointLight>(glm::vec3( 500.0f, 200.0f,  100.0f), glm::vec3(100000.0f)));
-        m_Lights.push_back(std::make_shared<PointLight>(glm::vec3(-500.0f, 200.0f, -100.0f), glm::vec3(100000.0f)));
+        m_Lights.push_back(std::make_shared<DiffuseAreaLight>(
+            std::make_shared<Sphere>(glm::vec3(0.0f, 800.0f, 0.0f), 1.0f),
+            glm::vec3(500000.0f)
+        ));
+
+        m_Lights.push_back(std::make_shared<DiffuseAreaLight>(
+            std::make_shared<Sphere>(glm::vec3(500.0f, 200.0f, 100.0f), 1.0f),
+            glm::vec3(100000.0f)
+        ));
+
+        m_Lights.push_back(std::make_shared<DiffuseAreaLight>(
+            std::make_shared<Sphere>(glm::vec3(-500.0f, 200.0f, -100.0f), 1.0f),
+            glm::vec3(100000.0f)
+        ));
 
         LOG_INFO("Total Primitives: {}", primitives.size());
         LOG_INFO("Total Lights: {}", m_Lights.size());
