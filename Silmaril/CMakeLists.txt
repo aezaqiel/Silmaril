@@ -70,6 +70,8 @@ add_executable(Silmaril
 
     src/Silmaril/PBRT/Samplers/Sampler.hpp
     src/Silmaril/PBRT/Samplers/Sampler.cpp
+    src/Silmaril/PBRT/Samplers/StratifiedSampler.hpp
+    src/Silmaril/PBRT/Samplers/StratifiedSampler.cpp
     src/Silmaril/PBRT/Samplers/RandomSampler.hpp
     src/Silmaril/PBRT/Samplers/RandomSampler.cpp
 

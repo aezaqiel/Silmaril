@@ -5,7 +5,7 @@
 #include "Silmaril/Core/Logger.hpp"
 
 #include "Cameras/PerspectiveCamera.hpp"
-#include "Samplers/RandomSampler.hpp"
+#include "Samplers/StratifiedSampler.hpp"
 #include "Integrators/RandomWalkIntegrator.hpp"
 
 #include "Loaders/ModelLoader.hpp"
@@ -32,7 +32,7 @@ namespace Silmaril {
             m_Config.fov
         );
 
-        m_Sampler = std::make_shared<RandomSampler>(m_Config.samples);
+        m_Sampler = std::make_shared<StratifiedSampler>(m_Config.samples);
 
         m_Integrator = std::make_unique<RandomWalkIntegrator>(RandomWalkIntegrator::Config{
             m_Camera,
