@@ -143,7 +143,7 @@ namespace Silmaril {
 
         bool hitAnything = false;
 
-        glm::vec3 invDir = 1.0f / ray.direction;
+        const glm::vec3& invDir = ray.invDirection;
         u32 dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
 
         u32 toVisitOffset = 0;

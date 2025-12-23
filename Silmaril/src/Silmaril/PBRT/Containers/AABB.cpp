@@ -6,7 +6,7 @@ namespace Silmaril {
     {
         for (usize axis = 0; axis < 3; ++axis) {
             const Bounds& ax = AxisBounds(axis);
-            const f32 adinv = 1.0f / ray.direction[axis];
+            const f32 adinv = ray.invDirection[axis];
 
             f32 t0 = (ax.min - ray.origin[axis]) * adinv;
             f32 t1 = (ax.max - ray.origin[axis]) * adinv;
