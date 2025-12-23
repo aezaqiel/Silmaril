@@ -6,11 +6,31 @@ namespace Silmaril {
 
     namespace {
 
-        struct BVHBuildStats
+        struct BVHBuildNode
         {
-            usize nodes { 0 };
-            usize leaves { 0 };
-            usize depth { 0 };
+            AABB bounds;
+            BVHBuildNode* children[2];
+            u32 splitAxis;
+            u32 firstPrimOffset;
+            u32 nPrimitives;
+
+            void InitLeaf(u32 first, u32 n, const AABB& b)
+            {
+                firstPrimOffset = first;
+                nPrimitives = n;
+                bounds = b;
+                children[0] = nullptr;
+                children[1] = nullptr;
+            }
+
+            void InitInterior(u32 axis, BVHBuildNode* c0, BVHBuildNode* c1)
+            {
+                children[0] = c0;
+                children[1] = c1;
+                bounds = AABB(c0->bounds, c1->bounds);
+                splitAxis = axis;
+                nPrimitives = 0;
+            }
         };
 
         glm::vec3 GetCentroid(const AABB& bbox)
@@ -22,23 +42,35 @@ namespace Silmaril {
             );
         }
 
-        std::shared_ptr<Primitive> BuildBVH(std::vector<std::shared_ptr<Primitive>> primitives, usize depth, BVHBuildStats& stats)
+        BVHBuildNode* BuildBVHRecursive(
+            std::vector<std::shared_ptr<Primitive>>& primitives,
+            u32 start, u32 end,
+            u32& totalNodes,
+            u32& totalLeaves,
+            u32 depth, u32& maxDepth
+        )
         {
-            stats.depth = std::max(stats.depth, depth);
-
-            if (primitives.empty()) return nullptr;
-            if (primitives.size() == 1) {
-                stats.leaves += 1;
-                return primitives[0];
-            }
-
-            stats.nodes += 1;
+            maxDepth = std::max(maxDepth, depth);
+            BVHBuildNode* node = new BVHBuildNode();
+            totalNodes++;
 
             AABB centroidBounds;
-            for (const auto& p : primitives) {
-                glm::vec3 c = GetCentroid(p->GetBound());
+            AABB bbox;
+            for (u32 i = start; i < end; ++i) {
+                AABB pb = primitives[i]->GetBound();
+                glm::vec3 c = GetCentroid(pb);
                 centroidBounds = AABB(centroidBounds, AABB(c, c));
+                bbox = AABB(bbox, pb);
             }
+
+            u32 nPrimitives = end - start;
+            if (nPrimitives == 1) {
+                node->InitLeaf(start, nPrimitives, bbox);
+                totalLeaves++;
+                return node;
+            }
+
+            AABB nodeBounds = bbox;
 
             i32 axis = 0;
             f32 maxExtent = centroidBounds.x.Size();
@@ -50,53 +82,102 @@ namespace Silmaril {
                 axis = 2;
             }
 
-            usize mid = primitives.size() / 2;
-            std::nth_element(primitives.begin(), primitives.begin() + mid, primitives.end(),
-                [&](const auto& a, const auto& b) -> bool {
+            u32 mid = (start + end) / 2;
+            std::nth_element(primitives.begin() + start, primitives.begin() + mid, primitives.begin() + end,
+                [axis](const std::shared_ptr<Primitive>& a, const std::shared_ptr<Primitive>& b) -> bool {
                     glm::vec3 ca = GetCentroid(a->GetBound());
                     glm::vec3 cb = GetCentroid(b->GetBound());
                     return ca[axis] < cb[axis];
                 }
             );
 
-            std::vector<std::shared_ptr<Primitive>> leftPrims(primitives.begin(), primitives.begin() + mid);
-            std::vector<std::shared_ptr<Primitive>> rightPrims(primitives.begin() + mid, primitives.end());
+            node->InitInterior(axis,
+                BuildBVHRecursive(primitives, start, mid, totalNodes, totalLeaves, depth + 1, maxDepth),
+                BuildBVHRecursive(primitives, mid, end, totalNodes, totalLeaves, depth + 1, maxDepth)
+            );
 
-            auto left = BuildBVH(leftPrims, depth + 1, stats);
-            auto right = BuildBVH(rightPrims, depth + 1, stats);
+            return node;
+        }
 
-            return std::make_shared<BVH>(left, right);
+        u32 FlattenBVHTree(BVHBuildNode* node, std::vector<LinearBVHNode>& nodes)
+        {
+            u32 offset = static_cast<u32>(nodes.size());
+            nodes.push_back({});
+            LinearBVHNode& linearNode = nodes[offset];
+
+            linearNode.bounds = node->bounds;
+            linearNode.nPrimitives = static_cast<u16>(node->nPrimitives);
+            linearNode.pad = 0;
+
+            if (node->nPrimitives > 0) {
+                linearNode.primitivesOffset = node->firstPrimOffset;
+                linearNode.axis = 0;
+            } else {
+                linearNode.axis = static_cast<u8>(node->splitAxis);
+                FlattenBVHTree(node->children[0], nodes);
+                linearNode.secondChildOffset = FlattenBVHTree(node->children[1], nodes);
+            }
+
+            return offset;
+        }
+
+        void DeleteBVHBuildNode(BVHBuildNode* node)
+        {
+            if (node) {
+                if (node->children[0]) DeleteBVHBuildNode(node->children[0]);
+                if (node->children[1]) DeleteBVHBuildNode(node->children[1]);
+                delete node;
+            }
         }
     
     }
 
-    BVH::BVH(const std::shared_ptr<Primitive>& left, const std::shared_ptr<Primitive>& right)
-        : m_Left(left), m_Right(right)
+    BVH::BVH(std::vector<std::shared_ptr<Primitive>>&& primitives, std::vector<LinearBVHNode>&& nodes)
+        : m_Primitives(std::move(primitives)), m_Nodes(std::move(nodes))
     {
-        AABB lBox = m_Left ? m_Left->GetBound() : AABB();
-        AABB rBox = m_Right ? m_Right->GetBound() : AABB();
-        m_Bound = AABB(lBox, rBox);
     }
 
     bool BVH::Intersect(const Ray& ray, HitInteraction& hit) const
     {
-        if (!m_Bound.Hit(ray, Bounds(0.0001f, hit.t))) {
-            return false;
-        }
+        if (m_Nodes.empty()) return false;
 
-        bool lHit = false;
-        if (m_Left) {
-            lHit = m_Left->Intersect(ray, hit);
-        }
+        bool hitAnything = false;
 
-        bool rHit = false;
-        if (m_Right) {
-            if (m_Right->GetBound().Hit(ray, Bounds(0.0001f, hit.t))) {
-                rHit = m_Right->Intersect(ray, hit);
+        glm::vec3 invDir = 1.0f / ray.direction;
+        u32 dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
+
+        u32 toVisitOffset = 0;
+        u32 currentNodeIndex = 0;
+        u32 nodesToVisit[64];
+
+        while (true) {
+            const LinearBVHNode& node = m_Nodes[currentNodeIndex];
+
+            if (node.bounds.Hit(ray, Bounds(0.0001f, hit.t))) {
+                if (node.nPrimitives > 0) {
+                    for (u32 i = 0; i < node.nPrimitives; ++i) {
+                        if (m_Primitives[node.primitivesOffset + i]->Intersect(ray, hit)) {
+                            hitAnything = true;
+                        }
+                    }
+                    if (toVisitOffset == 0) break;
+                    currentNodeIndex = nodesToVisit[--toVisitOffset];
+                } else {
+                    if (dirIsNeg[node.axis]) {
+                        nodesToVisit[toVisitOffset++] = currentNodeIndex + 1;
+                        currentNodeIndex = node.secondChildOffset;
+                    } else {
+                        nodesToVisit[toVisitOffset++] = node.secondChildOffset;
+                        currentNodeIndex = currentNodeIndex + 1;
+                    }
+                }
+            } else {
+                if (toVisitOffset == 0) break;
+                currentNodeIndex = nodesToVisit[--toVisitOffset];
             }
         }
 
-        return lHit || rHit;
+        return hitAnything;
     }
 
     void BVH::FillSurfaceInteraction(const Ray& ray, const HitInteraction& hit, SurfaceInteraction& intersection) const
@@ -104,19 +185,29 @@ namespace Silmaril {
         LOG_ERROR("FillInteraction called on BVH node. This should not happen if HitRecord points to leaf primitives.");
     }
 
-    std::shared_ptr<Primitive> BVH::Create(std::vector<std::shared_ptr<Primitive>> primitives)
+    std::shared_ptr<Primitive> BVH::Create(std::vector<std::shared_ptr<Primitive>>&& primitives)
     {
-        BVHBuildStats stats;
+        if (primitives.empty()) return nullptr;
 
-        auto root = BuildBVH(primitives, 0, stats);
+        u32 maxDepth = 0;
+        u32 totalNodes = 0;
+        u32 totalLeaves = 0;
+
+        BVHBuildNode* root = BuildBVHRecursive(primitives, 0, static_cast<u32>(primitives.size()), totalNodes, totalLeaves, 0, maxDepth);
+
+        std::vector<LinearBVHNode> linearNodes;
+        linearNodes.reserve(totalNodes);
+        FlattenBVHTree(root, linearNodes);
+
+        DeleteBVHBuildNode(root);
 
         LOG_INFO("BVH Construction Metrics");
         LOG_INFO(" - Total Primitives: {}", primitives.size());
-        LOG_INFO(" - Internal Nodes: {}", stats.nodes);
-        LOG_INFO(" - Leaf Nodes: {}", stats.leaves);
-        LOG_INFO(" - Max Tree Depth: {}", stats.depth);
+        LOG_INFO(" - Internal Nodes: {}", totalNodes);
+        LOG_INFO(" - Leaf Nodes: {}", totalLeaves);
+        LOG_INFO(" - Max Tree Depth: {}", maxDepth);
 
-        return root;
+        return std::make_shared<BVH>(std::move(primitives), std::move(linearNodes));
     }
 
 }

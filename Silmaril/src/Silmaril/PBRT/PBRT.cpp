@@ -93,7 +93,6 @@ namespace Silmaril {
         LOG_INFO("Initializing Scene...");
 
         std::vector<std::shared_ptr<Primitive>> primitives;
-        std::vector<std::shared_ptr<Light>> lights;
 
         auto model = ModelLoader::LoadOBJ(m_Config.model);
         if (model) {
@@ -108,20 +107,20 @@ namespace Silmaril {
 
         LOG_INFO("Building Aggregate BVH...");
         auto BVHStart = std::chrono::steady_clock::now();
-        auto bvh = BVH::Create(primitives);
+        m_AggregatePrimitive = BVH::Create(std::move(primitives));
         auto BVHEnd = std::chrono::steady_clock::now();
 
         std::chrono::duration<f64> timeBVH = BVHEnd - BVHStart;
         LOG_INFO("BVH built in {:.4f} seconds", timeBVH.count());
 
-        lights.push_back(std::make_shared<PointLight>(glm::vec3(0.0f, 800.0f, 0.0f), glm::vec3(500000.0f)));
-        lights.push_back(std::make_shared<PointLight>(glm::vec3( 500.0f, 200.0f,  100.0f), glm::vec3(100000.0f)));
-        lights.push_back(std::make_shared<PointLight>(glm::vec3(-500.0f, 200.0f, -100.0f), glm::vec3(100000.0f)));
+        m_Lights.push_back(std::make_shared<PointLight>(glm::vec3(0.0f, 800.0f, 0.0f), glm::vec3(500000.0f)));
+        m_Lights.push_back(std::make_shared<PointLight>(glm::vec3( 500.0f, 200.0f,  100.0f), glm::vec3(100000.0f)));
+        m_Lights.push_back(std::make_shared<PointLight>(glm::vec3(-500.0f, 200.0f, -100.0f), glm::vec3(100000.0f)));
 
         LOG_INFO("Total Primitives: {}", primitives.size());
-        LOG_INFO("Total Lights: {}", lights.size());
+        LOG_INFO("Total Lights: {}", m_Lights.size());
 
-        m_Scene = std::make_unique<Scene>(bvh, lights);
+        m_Scene = std::make_unique<Scene>(m_AggregatePrimitive, m_Lights);
     }
 
 }

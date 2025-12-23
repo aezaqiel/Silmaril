@@ -51,8 +51,9 @@ namespace Silmaril {
         std::shared_ptr<Sampler> m_Sampler;
         std::unique_ptr<Integrator> m_Integrator;
 
-        std::vector<std::shared_ptr<Primitive>> m_Primitives;
+        std::shared_ptr<Primitive> m_AggregatePrimitive;
         std::vector<std::shared_ptr<Light>> m_Lights;
+
         std::unique_ptr<Scene> m_Scene;
     };
 
