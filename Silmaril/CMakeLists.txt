@@ -17,6 +17,9 @@ add_executable(Silmaril
     src/Silmaril/Core/Window.hpp
     src/Silmaril/Core/Window.cpp
 
+    src/Silmaril/DSA/PCG32.hpp
+    src/Silmaril/DSA/PCG32.cpp
+
     src/Silmaril/PBRT/Cameras/Camera.hpp
     src/Silmaril/PBRT/Cameras/Camera.cpp
     src/Silmaril/PBRT/Cameras/Film.hpp

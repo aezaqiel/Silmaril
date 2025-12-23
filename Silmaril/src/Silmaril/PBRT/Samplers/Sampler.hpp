@@ -17,9 +17,9 @@ namespace Silmaril {
 
         inline u32 GetSPP() const { return m_MaxSPP; }
 
-        virtual void StartPixel(u32 x, u32 y)
+        virtual void StartPixel(u32 x, u32 y, u32 sample)
         {
-            m_CurrentSampleIndex = 0;
+            m_CurrentSampleIndex = sample;
         }
 
         virtual bool StartNextSample()

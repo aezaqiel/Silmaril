@@ -80,7 +80,7 @@ namespace Silmaril {
 
         for (u32 y = tile.y; y < tile.y + tile.h; ++y) {
             for (u32 x = tile.x; x < tile.x + tile.w; ++x) {
-                sampler->StartPixel(x, y);
+                sampler->StartPixel(x, y, sample);
 
                 CameraSample cs;
                 cs.pFilm = glm::vec2(x, y) + sampler->Get2D();

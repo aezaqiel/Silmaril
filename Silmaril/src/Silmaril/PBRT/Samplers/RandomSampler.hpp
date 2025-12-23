@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Sampler.hpp"
+#include "Silmaril/DSA/PCG32.hpp"
 
 namespace Silmaril {
 
@@ -15,11 +16,12 @@ namespace Silmaril {
         virtual f32 Get1D() override;
         virtual glm::vec2 Get2D() override;
 
+        virtual void StartPixel(u32 x, u32 y, u32 sample) override;
+
         virtual std::unique_ptr<Sampler> Clone() const override;
 
     private:
-        std::mt19937 m_Gen;
-        std::uniform_real_distribution<f32> m_Dist { 0.0f, 1.0f };
+        PCG32 m_PCG;
     };
 
 }
