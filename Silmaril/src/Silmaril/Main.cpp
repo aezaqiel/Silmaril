@@ -5,17 +5,19 @@ int main()
 {
     Silmaril::Logger::Init();
 
-    constexpr u32 IMAGE_WIDTH = 1920;
-    constexpr u32 IMAGE_HEIGHT = 1080;
-    constexpr u32 SAMPLES = 512;
+    constexpr u32 IMAGE_WIDTH = 400;
+    constexpr u32 IMAGE_HEIGHT = 300;
+    constexpr u32 SAMPLES = 32;
     constexpr u32 DEPTH = 8;
 
     constexpr u32 TILE_SIZE = 16;
 
     Silmaril::Application* app = new Silmaril::Application({
-        .width = IMAGE_WIDTH,
-        .height = IMAGE_HEIGHT,
-        .title = "Silmaril",
+        .window = {
+            .width = IMAGE_WIDTH,
+            .height = IMAGE_HEIGHT,
+            .title = "Silmaril"
+        },
 
         .pbrt = {
             .width = IMAGE_WIDTH,
@@ -31,7 +33,7 @@ int main()
             .up = { 0.0f, 1.0f, 0.0f },
             .fov = 90.0f,
 
-            .output = "Sponza.png"
+            .output = "Output.png"
         },
 
         .renderer = {

@@ -13,7 +13,15 @@ namespace Silmaril {
         friend class Application;
         using EventCallbackFn = std::function<void(const Event&)>;
     public:
-        Window(u32 width, u32 height, const std::string& title);
+        struct Config
+        {
+            u32 width;
+            u32 height;
+            std::string title;
+        };
+    
+    public:
+        Window(const Config& config);
         ~Window();
 
         void SwapBuffers();

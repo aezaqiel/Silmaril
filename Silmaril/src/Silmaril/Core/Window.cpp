@@ -10,7 +10,7 @@
 
 namespace Silmaril {
 
-    Window::Window(u32 width, u32 height, const std::string& title)
+    Window::Window(const Config& config)
     {
         LOG_INFO("Creating Window");
 
@@ -28,7 +28,7 @@ namespace Silmaril {
 
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-        m_Window = glfwCreateWindow(static_cast<i32>(width), static_cast<i32>(height), title.c_str(), nullptr, nullptr);
+        m_Window = glfwCreateWindow(static_cast<i32>(config.width), static_cast<i32>(config.height), config.title.c_str(), nullptr, nullptr);
 
         glfwMakeContextCurrent(m_Window);
 

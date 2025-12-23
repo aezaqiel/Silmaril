@@ -14,10 +14,7 @@ namespace Silmaril {
     public:
         struct Config
         {
-            u32 width;
-            u32 height;
-            std::string title;
-
+            Window::Config window;
             PBRT::Config pbrt;
             Renderer::Config renderer;
         };

@@ -7,7 +7,7 @@ namespace Silmaril {
     Application::Application(const Config& config)
         : m_Config(config)
     {
-        m_Window = std::make_unique<Window>(config.width, config.height, "Silmaril");
+        m_Window = std::make_unique<Window>(config.window);
         m_Window->BindEventCallback(BIND_EVENT_FN(Application::DispatchEvents));
 
         m_Renderer = std::make_unique<Renderer>(config.renderer);
