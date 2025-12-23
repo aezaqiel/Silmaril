@@ -16,6 +16,8 @@ add_executable(Silmaril
     src/Silmaril/Core/Events.hpp
     src/Silmaril/Core/Window.hpp
     src/Silmaril/Core/Window.cpp
+    src/Silmaril/Core/JobSystem.hpp
+    src/Silmaril/Core/JobSystem.cpp
 
     src/Silmaril/DSA/PCG32.hpp
     src/Silmaril/DSA/PCG32.cpp

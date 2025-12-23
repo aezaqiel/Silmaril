@@ -1,9 +1,11 @@
 #include "Core/Logger.hpp"
+#include "Core/JobSystem.hpp"
 #include "Core/Application.hpp"
 
 int main()
 {
     Silmaril::Logger::Init();
+    Silmaril::JobSystem::Init(4);
 
     constexpr u32 IMAGE_WIDTH = 400;
     constexpr u32 IMAGE_HEIGHT = 300;
@@ -46,5 +48,6 @@ int main()
     app->Run();
     delete app;
 
+    Silmaril::JobSystem::Shutdown();
     Silmaril::Logger::Shutdown();
 }

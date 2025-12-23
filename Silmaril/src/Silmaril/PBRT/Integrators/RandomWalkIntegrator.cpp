@@ -8,6 +8,7 @@
 #include "Silmaril/PBRT/Materials/BSDF.hpp"
 
 #include "Silmaril/Core/Logger.hpp"
+#include "Silmaril/Core/JobSystem.hpp"
 
 namespace Silmaril {
 
@@ -46,18 +47,21 @@ namespace Silmaril {
 
         LOG_INFO("Rendering {} tiles ({}x{}) for {} samples", totalTiles, m_TileSize, m_TileSize, sampler->GetSPP());
 
-        for (u32 pass = 1; pass < sampler->GetSPP(); ++pass) {
+        for (u32 pass = 1; pass < (sampler->GetSPP() + 1); ++pass) {
             auto start = std::chrono::steady_clock::now();
 
-            std::for_each(std::execution::par, tiles.begin(), tiles.end(), [&](const Tile& tile) {
+            JobSystem::Dispatch(static_cast<u32>(tiles.size()), 1, [&](JobDispatchArgs args) {
                 if (m_CancelRender) return;
 
-                RenderTile(tile, scene, pass);
+                const Tile& tile = tiles[args.jobIndex];
 
+                RenderTile(tile, scene, pass);
                 if (m_RenderCallback) {
                     m_RenderCallback(tile.x, tile.y, tile.w, tile.h);
                 }
             });
+
+            JobSystem::Sync();
 
             if (m_CancelRender) {
                 LOG_WARN("In-progress render cancelled");
