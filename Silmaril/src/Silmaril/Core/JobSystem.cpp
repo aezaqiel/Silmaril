@@ -48,7 +48,7 @@ namespace Silmaril {
     {
         if (jobCount == 0 || groupSize ==  0) return;
 
-        u32 groupCount = (jobCount + groupSize - 1) / groupSize;
+        u32 groupCount = (jobCount - 1) / groupSize + 1;
 
         for (u32 groupIndex = 0; groupIndex < groupCount; ++groupIndex) {
             Execute([job, groupIndex, groupSize, jobCount]() {
@@ -79,7 +79,7 @@ namespace Silmaril {
 
             {
                 std::unique_lock<std::mutex> lock(s_QueueMutex);
-                s_WakeCondition.wait(lock, []() { return !s_JobQueue.empty(); });
+                s_WakeCondition.wait(lock, []() { return !s_JobQueue.empty() || !s_Running; });
 
                 if (!s_Running && s_JobQueue.empty()) {
                     return;
