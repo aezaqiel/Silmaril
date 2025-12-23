@@ -24,7 +24,7 @@ namespace Silmaril {
         };
     public:
         RandomWalkIntegrator(const Config& config);
-        ~RandomWalkIntegrator() = default;
+        virtual ~RandomWalkIntegrator() = default;
 
         virtual void Render(const Scene& scene) override;
 
@@ -39,7 +39,7 @@ namespace Silmaril {
 
     private:
         void RenderTile(const Tile& tile, const Scene& scene, u32 sample);
-        glm::vec3 Li(const Ray& ray, const Scene& scene, Sampler& sampler, usize depth);
+        glm::vec3 Li(const Ray& ray, const Scene& scene, Sampler& sampler, u32 depth, glm::vec3 beta = glm::vec3(1.0f));
 
     private:
         Config m_Config;

@@ -87,22 +87,22 @@ namespace Silmaril {
 
                 Ray ray = camera->GenerateRay(cs);
 
-                glm::vec3 L = Li(ray, scene, *sampler, 0);
+                glm::vec3 L = Li(ray, scene, *sampler, 0, glm::vec3(1.0f));
 
                 camera->GetFilm().AccumulateSample(x, y, L, sample);
             }
         }
     }
 
-    glm::vec3 RandomWalkIntegrator::Li(const Ray& ray, const Scene& scene, Sampler& sampler, usize depth)
+    glm::vec3 RandomWalkIntegrator::Li(const Ray& ray, const Scene& scene, Sampler& sampler, u32 depth, glm::vec3 beta)
     {
         if (depth >= m_Config.depth) return glm::vec3(0.0f);
 
         SurfaceInteraction intersect;
         if (!scene.Intersect(ray, intersect)) {
-            glm::vec3 unit_dir = glm::normalize(ray.direction);
-            f32 t = 0.5f * (unit_dir.y + 1.0f);
-            return (1.0f - t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f) * 0.2f;
+            // Skybox
+            f32 t = 0.5f * (glm::normalize(ray.direction).y + 1.0f);
+            return glm::mix(glm::vec3(1.0f), glm::vec3(0.5f, 0.7f, 1.0f), t);
         }
 
         const Material* material = intersect.primitive->GetMaterial();
@@ -114,6 +114,7 @@ namespace Silmaril {
         glm::vec3 L(0.0f);
         glm::vec3 wo = -ray.direction;
 
+        // Direct Light
         for (const auto& light : scene.GetLights()) {
             auto ls = light->SampleLi(intersect, sampler.Get2D());
 
@@ -131,11 +132,28 @@ namespace Silmaril {
             }
         }
 
+        // Indirect Lighting
         auto bs = intersect.bsdf->SampleF(wo, sampler.Get2D());
         if (bs && bs->pdf > 0) {
+            glm::vec3 f = bs->f * glm::abs(glm::dot(intersect.shading.n, bs->wi)) / bs->pdf;
+            glm::vec3 nextBeta = beta * f;
+            f32 pSurvival = 1.0f;
+
+            if (depth > 3) {
+                f32 maxBeta = std::max({ nextBeta.r, nextBeta.g, nextBeta.b });
+                f32 q = std::max(0.05f, 1.0f - maxBeta);
+
+                if (sampler.Get1D() < q) {
+                    return L;
+                }
+
+                pSurvival = 1.0f - q;
+            }
+
             Ray nextRay = intersect.SpawnRay(bs->wi);
-            glm::vec3 indirect = Li(nextRay, scene, sampler, depth + 1);
-            L += bs->f * indirect * glm::abs(glm::dot(intersect.shading.n, bs->wi)) / bs->pdf;
+            glm::vec3 indirect = Li(nextRay, scene, sampler, depth + 1, nextBeta / pSurvival);
+
+            L += (f / pSurvival) * indirect;
         }
 
         return L;
