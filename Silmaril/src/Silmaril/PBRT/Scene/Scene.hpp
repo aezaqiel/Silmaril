@@ -23,15 +23,22 @@ namespace Silmaril {
         inline bool Intersect(const Ray& ray, SurfaceInteraction& intersect) const
         {
             if (!m_Aggregate) return false;
-            return m_Aggregate->Intersect(ray, intersect);
+
+            HitInteraction hit;
+            if (m_Aggregate->Intersect(ray, hit)) {
+                hit.primitive->FillSurfaceInteraction(ray, hit, intersect);
+                return true;
+            }
+
+            return false;
         }
 
         inline bool IntersectP(const Ray& ray) const
         {
             if (!m_Aggregate) return false;
 
-            SurfaceInteraction scratch;
-            return m_Aggregate->Intersect(ray, scratch);
+            HitInteraction hit;
+            return m_Aggregate->Intersect(ray, hit);
         }
 
     private:

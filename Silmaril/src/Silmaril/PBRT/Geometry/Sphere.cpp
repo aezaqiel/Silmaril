@@ -14,7 +14,7 @@ namespace Silmaril {
         return AABB(m_Center - glm::vec3(m_Radius), m_Center + glm::vec3(m_Radius));
     }
 
-    bool Sphere::Intersect(const Ray& ray, f32& distance, SurfaceInteraction& intersect) const
+    bool Sphere::Intersect(const Ray& ray, f32& tHit, f32 tMax) const
     {
         glm::vec3 oc = ray.origin - m_Center;
 
@@ -29,16 +29,21 @@ namespace Silmaril {
         f32 sqrtd = glm::sqrt(discriminant);
         f32 root = (-b - sqrtd) / (2.0f * a);
 
-        if (root <= std::numeric_limits<f32>::epsilon()) {
+        if (root <= std::numeric_limits<f32>::epsilon() || root > tMax) {
             root = (-b + sqrtd) / (2.0f * a);
-            if (root <= std::numeric_limits<f32>::epsilon()) {
+            if (root <= std::numeric_limits<f32>::epsilon() || root > tMax) {
                 return false;
             }
         }
 
-        distance = root;
+        tHit = root;
 
-        glm::vec3 p = ray.At(root);
+        return true;
+    }
+
+    void Sphere::FillSurfaceInteraction(const Ray& ray, f32 tHit, SurfaceInteraction& intersection) const
+    {
+        glm::vec3 p = ray.At(tHit);
         glm::vec3 n = (p - m_Center) / m_Radius;
 
         f32 theta = glm::acos(std::clamp(-n.y, -1.0f, 1.0f));
@@ -69,10 +74,8 @@ namespace Silmaril {
 
         glm::vec3 pError = glm::abs(p) * std::numeric_limits<f32>::max() * 5.0f;
 
-        intersect = SurfaceInteraction(p, pError, uv, -ray.direction, dpdu, dpdv, dndu, dndv, ray.time, this);
-        intersect.t = root;
-
-        return true;
+        intersection = SurfaceInteraction(p, pError, uv, -ray.direction, dpdu, dpdv, dndu, dndv, ray.time, this);
+        intersection.t = tHit;
     }
 
 }

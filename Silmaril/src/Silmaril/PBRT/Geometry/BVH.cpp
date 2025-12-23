@@ -78,46 +78,30 @@ namespace Silmaril {
         m_Bound = AABB(lBox, rBox);
     }
 
-    bool BVH::Intersect(const Ray& ray, SurfaceInteraction& intersection) const
+    bool BVH::Intersect(const Ray& ray, HitInteraction& hit) const
     {
-        if (!m_Bound.Hit(ray, Bounds(0.0001f, std::numeric_limits<f32>::max()))) {
+        if (!m_Bound.Hit(ray, Bounds(0.0001f, hit.t))) {
             return false;
         }
 
         bool lHit = false;
-        SurfaceInteraction lIntersect;
-
         if (m_Left) {
-            lHit = m_Left->Intersect(ray, lIntersect);
+            lHit = m_Left->Intersect(ray, hit);
         }
 
-        f32 rTMax = lHit ? lIntersect.t : std::numeric_limits<f32>::max();
         bool rHit = false;
-        SurfaceInteraction rIntersect;
-
         if (m_Right) {
-            if (m_Right->GetBound().Hit(ray, Bounds(0.0001f, rTMax))) {
-                rHit = m_Right->Intersect(ray, rIntersect);
+            if (m_Right->GetBound().Hit(ray, Bounds(0.0001f, hit.t))) {
+                rHit = m_Right->Intersect(ray, hit);
             }
         }
 
-        if (lHit && rHit) {
-            if (lIntersect.t < rIntersect.t) {
-                intersection = lIntersect;
-            } else {
-                intersection = rIntersect;
-            }
+        return lHit || rHit;
+    }
 
-            return true;
-        } else if (lHit) {
-            intersection = lIntersect;
-            return true;
-        } else if (rHit) {
-            intersection = rIntersect;
-            return true;
-        }
-
-        return false;
+    void BVH::FillSurfaceInteraction(const Ray& ray, const HitInteraction& hit, SurfaceInteraction& intersection) const
+    {
+        LOG_ERROR("FillInteraction called on BVH node. This should not happen if HitRecord points to leaf primitives.");
     }
 
     std::shared_ptr<Primitive> BVH::Create(std::vector<std::shared_ptr<Primitive>> primitives)

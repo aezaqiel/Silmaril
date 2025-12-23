@@ -10,6 +10,12 @@ namespace Silmaril {
     class Shape;
     class Primitive;
 
+    struct HitInteraction
+    {
+        f32 t { std::numeric_limits<f32>::max() };
+        const Primitive* primitive { nullptr };
+    };
+
     struct Interaction
     {
         glm::vec3 p;

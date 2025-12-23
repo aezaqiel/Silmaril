@@ -21,7 +21,7 @@ namespace Silmaril {
         return bbox;
     }
 
-    bool Triangle::Intersect(const Ray& ray, f32& distance, SurfaceInteraction& intersect) const
+    bool Triangle::Intersect(const Ray& ray, f32& tHit, f32 tMax) const
     {
         const u32 idx0 = m_Mesh->indices[m_Index + 0];
         const u32 idx1 = m_Mesh->indices[m_Index + 1];
@@ -52,7 +52,35 @@ namespace Silmaril {
 
         if (t < 0.0f) return false;
 
-        distance = t;
+        tHit = t;
+
+        return true;
+    }
+
+    void Triangle::FillSurfaceInteraction(const Ray& ray, f32 tHit, SurfaceInteraction& intersection) const
+    {
+        const u32 idx0 = m_Mesh->indices[m_Index + 0];
+        const u32 idx1 = m_Mesh->indices[m_Index + 1];
+        const u32 idx2 = m_Mesh->indices[m_Index + 2];
+
+        const glm::vec3& p0 = m_Mesh->p[idx0];
+        const glm::vec3& p1 = m_Mesh->p[idx1];
+        const glm::vec3& p2 = m_Mesh->p[idx2];
+
+        glm::vec3 e1 = p1 - p0;
+        glm::vec3 e2 = p2 - p0;
+
+        glm::vec3 s1 = glm::cross(ray.direction, e2);
+
+        f32 divisor = glm::dot(s1, e1);
+        f32 invDivisor = 1.0f / divisor;
+
+        glm::vec3 s = ray.origin - p0;
+        f32 b1 = glm::dot(s, s1) * invDivisor;
+
+        glm::vec3 s2 = glm::cross(s, e1);
+        f32 b2 = glm::dot(ray.direction, s2) * invDivisor;
+
         f32 b0 = 1.0f - b1 - b2;
 
         glm::vec3 pHit = b0 * p0 + b1 * p1 + b2 * p2;
@@ -102,8 +130,8 @@ namespace Silmaril {
         glm::vec3 dndu(0.0f);
         glm::vec3 dndv(0.0f);
 
-        intersect = SurfaceInteraction(pHit, pError, uvHit, -ray.direction, dpdu, dpdv, dndu, dndv, ray.time, this);
-        intersect.t = t;
+        intersection = SurfaceInteraction(pHit, pError, uvHit, -ray.direction, dpdu, dpdv, dndu, dndv, ray.time, this);
+        intersection.t = tHit;
 
         if (!m_Mesh->n.empty()) {
             const glm::vec3& n0 = m_Mesh->n[idx0];
@@ -127,11 +155,9 @@ namespace Silmaril {
                 shadingDndv = glm::vec3(0.0f);
             }
 
-            intersect.SetShadingGeometry(dpdu, dpdv, shadingDndu, shadingDndv, false);
-            intersect.shading.n = shadingNormal;
+            intersection.SetShadingGeometry(dpdu, dpdv, shadingDndu, shadingDndv, false);
+            intersection.shading.n = shadingNormal;
         }
-
-        return true;
     }
 
     std::vector<std::shared_ptr<Shape>> Triangle::CreateTriangleMesh(const std::shared_ptr<Mesh>& mesh)

@@ -11,7 +11,8 @@ namespace Silmaril {
     class Primitive
     {
     public:
-        virtual bool Intersect(const Ray& ray, SurfaceInteraction& intersect) const = 0;
+        virtual bool Intersect(const Ray& ray, HitInteraction& hit) const = 0;
+        virtual void FillSurfaceInteraction(const Ray& ray, const HitInteraction& hit, SurfaceInteraction& intersection) const = 0;
 
         virtual AABB GetBound() const = 0;
         virtual const Material* GetMaterial() const = 0;

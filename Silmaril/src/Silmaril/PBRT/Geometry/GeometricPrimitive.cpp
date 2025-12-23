@@ -18,17 +18,27 @@ namespace Silmaril {
         return AABB();
     }
 
-    bool GeometricPrimitive::Intersect(const Ray& ray, SurfaceInteraction& intersect) const
+    bool GeometricPrimitive::Intersect(const Ray& ray, HitInteraction& hit) const
     {
         if (!m_Shape) return false;
 
         f32 t;
-        if (!m_Shape->Intersect(ray, t, intersect)) {
+        if (!m_Shape->Intersect(ray, t, hit.t)) {
             return false;
         }
 
-        intersect.primitive = this;
+        hit.t = t;
+        hit.primitive = this;
+
         return true;
+    }
+
+    void GeometricPrimitive::FillSurfaceInteraction(const Ray& ray, const HitInteraction& hit, SurfaceInteraction& intersection) const
+    {
+        if (m_Shape) {
+            m_Shape->FillSurfaceInteraction(ray, hit.t, intersection);
+            intersection.primitive = this;
+        }
     }
 
 }
